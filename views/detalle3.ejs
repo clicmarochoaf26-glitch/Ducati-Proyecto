@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducati Desmo 450MX | Supera los Límites</title>
+    <link rel="icon" type="image/png" href="/img/logo/logo.png">
+    <link rel="apple-touch-icon" href="/img/logo/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050505;
+            background-image:
+                linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        
+        .engine-hint {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #dc2626;
+            color: white;
+            padding: 5px 12px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-radius: 2px;
+            animation: bounce 2s infinite;
+            z-index: 200;
+        }
+
+        .engine-hint::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #dc2626;
+        }
+
+        .engine-on .engine-hint {
+            display: none;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        
+        .hotspot {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: #dc2626;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000 !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: scale(0);
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+            pointer-events: auto !important;
+        }
+
+        .engine-on .hotspot {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hotspot:hover {
+            transform: scale(1.3);
+            background: #fff;
+        }
+
+        .hotspot:hover i {
+            color: #dc2626;
+        }
+
+        .hotspot::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #dc2626;
+            border-radius: 50%;
+            animation: pulse-mx 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse-mx {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        .hotspot-card {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            background: #000;
+            border: 1px solid #dc2626;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .hotspot:hover .hotspot-card {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wrapper-360 {
+            perspective: 1200px;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 50;
+            cursor: move;
+            touch-action: none;
+        }
+
+        #moto-ducati {
+            width: 95%;
+            max-width: 800px;
+            transition: transform 0.1s ease-out, filter 0.8s ease;
+            filter: brightness(0.2) grayscale(100%);
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .engine-on #moto-ducati {
+            filter: brightness(1.1) grayscale(0%);
+        }
+
+        .telemetry-adventure {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 4px solid #dc2626;
+            padding: 15px;
+            min-width: 150px;
+        }
+
+        .btn-adquirir {
+            background: #dc2626;
+            color: #fff;
+            padding: 15px 35px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: 0.3s;
+            border: 1px solid #dc2626;
+            font-style: italic;
+        }
+
+        .vibrando {
+            animation: vibration-mx 0.05s infinite;
+        }
+
+        @keyframes vibration-mx {
+            0% {
+                transform: rotateY(var(--rot, 0deg)) translate(0, 0);
+            }
+
+            25% {
+                transform: rotateY(var(--rot, 0deg)) translate(1px, -1px);
+            }
+
+            50% {
+                transform: rotateY(var(--rot, 0deg)) translate(-1px, 1px);
+            }
+
+            100% {
+                transform: rotateY(var(--rot, 0deg)) translate(0, 0);
+            }
+        }
+
+        .floor-glow {
+            position: absolute;
+            bottom: 20%;
+            width: 300px;
+            height: 100px;
+            background: radial-gradient(ellipse, rgba(220, 38, 38, 0.15) 0%, transparent 70%);
+            filter: blur(30px);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .engine-on .floor-glow {
+            opacity: 1;
+        }
+
+        @media (min-width: 768px) {
+            .wrapper-360 {
+                height: 500px;
+            }
+
+            .floor-glow {
+                width: 500px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="modalCompra"
+        class="fixed inset-0 z-[5000] hidden bg-black/98 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-white/10 w-full max-w-lg p-12 relative shadow-2xl">
+            <div class="absolute top-0 right-0 p-4">
+                <button onclick="cerrarModal()" class="text-zinc-500 hover:text-white transition text-2xl">×</button>
+            </div>
+            <h3 class="text-4xl font-black uppercase italic mb-10 leading-none">RESERVA<br><span
+                    class="text-red-600 underline decoration-1 underline-offset-8">OFICIAL</span></h3>
+            <form action="/comprar/<%= moto._id %>" method="POST" class="space-y-8">
+                <div>
+                    <label class="text-[8px] font-black uppercase text-zinc-500 block mb-2 italic">Concesionario
+                        Oficial</label>
+                    <select id="selectSede" name="sedeElegida" required
+                        class="w-full bg-zinc-900 border border-zinc-800 p-4 text-xs font-bold text-white outline-none focus:border-red-600 appearance-none cursor-pointer">
+                        <option value="Caracas, Venezuela">Garage Las Mercedes, Caracas</option>
+                        <option value="Roma, Italia">Ducati Italia, Roma</option>
+                        <option value="Madrid, España">Ducati España, Madrid</option>
+                        <option value="Miami, Usa">Ducati USA, Miami </option>
+                        <option value="Tokyo, Japan">Ducati Tokyo, Nishi</option>
+                        <option value="Dubai, UAE">Ducati Dubai, Wheels of Arabia</option>
+                        <option value="Dubai, UAE">Ducati Germany, Munich</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold uppercase text-red-600 block mb-3 tracking-widest">Fecha de
+                        Protocolo</label>
+                    <input type="date" required
+                        class="w-full bg-zinc-900 border border-white/5 p-5 text-xs font-bold text-white outline-none focus:border-red-600 transition">
+                </div>
+                <div class="border-y border-white/5 py-6 flex justify-between items-center">
+                    <p class="text-[11px] uppercase font-mono text-zinc-500">Valor de Adquisición:</p>
+                    <p class="text-3xl font-black italic text-white">
+                        <%= moto.precio %>
+                    </p>
+                </div>
+                <button type="submit"
+                    class="w-full bg-red-600 text-white py-5 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500">Confirmar
+                    Transacción</button>
+            </form>
+        </div>
+    </div>
+
+    <nav
+        class="fixed top-0 w-full z-[500] bg-black/80 backdrop-blur-md border-b border-white/5 p-5 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img src="/img/logo/logo.png" alt="Ducati" class="h-4">
+            <a href="/"
+                class="text-[9px] font-bold uppercase tracking-widest border border-white/10 px-4 py-2 hover:bg-white hover:text-black transition">Volver
+                al inicio</a>
+        </div>
+        <div class="flex items-center gap-8">
+            <span class="hidden lg:block text-[9px] font-mono text-red-600 tracking-[0.4em] uppercase font-bold">Desmo
+                450MX // RACING DIVISION</span>
+            <div class="flex gap-4 items-center">
+                <% if (session) { %>
+                    <a href="/perfil" class="text-[10px] font-black uppercase italic">PERFIL</a>
+                    <a href="/logout" class="text-[10px] font-black uppercase text-zinc-500">SALIR</a>
+                    <% } else { %>
+                        <a href="/login" class="text-[10px] font-black uppercase">LOGIN</a>
+                        <% } %>
+            </div>
+        </div>
+    </nav>
+
+    <section id="seccion-inicio" class="relative min-h-screen flex items-center justify-center pt-20">
+        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+            <div>
+                <h1 class="text-5xl md:text-7xl lg:text-9xl font-black italic mb-6 uppercase leading-none">MÁS ALLÁ DEL
+                    <br><span class="text-red-600">BARRO.</span>
+                </h1>
+
+                <div class="flex gap-4 mb-8">
+                    <div class="telemetry-adventure">
+                        <p class="text-[8px] text-zinc-500 uppercase font-bold mb-1 italic">RPM_IDLE</p>
+                        <span id="val-rpm" class="text-2xl font-black italic">0</span>
+                    </div>
+                    <div class="telemetry-adventure">
+                        <p class="text-[8px] text-zinc-500 uppercase font-bold mb-1 italic">ENG_TEMP</p>
+                        <span id="val-temp" class="text-2xl font-black italic">22°C</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6 mb-12">
+                    <div class="relative">
+                        <div id="hint-start" class="engine-hint">Encender Bestia</div>
+                        <button id="btn-start"
+                            class="w-16 h-16 rounded-full border-2 border-red-600/30 flex items-center justify-center hover:border-red-600 transition-all bg-red-600/5 group">
+                            <i class="fa-solid fa-bolt text-xl text-zinc-600 group-hover:text-red-600"></i>
+                        </button>
+                    </div>
+                    <button onclick="abrirModal()"
+                        class="btn-adquirir shadow-[0_0_30px_rgba(220,38,38,0.2)] text-xs md:text-sm italic">Reservar</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 border-t border-zinc-800 pt-8">
+                    <div>
+                        <p class="text-[10px] text-zinc-600 uppercase font-bold">Motor</p>
+                        <p class="text-xl md:text-2xl font-black italic">450 <span class="text-xs">Desmo</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-zinc-600 uppercase font-bold">Potencia</p>
+                        <p class="text-xl md:text-2xl font-black italic">63.5 <span class="text-xs">CV</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-red-600 uppercase font-bold">Inversión</p>
+                        <p class="text-xl md:text-2xl font-black italic">€ <%= moto.precio %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrapper-360" id="sensor-giro">
+                <div class="floor-glow"></div>
+                <div class="absolute top-0 left-0 telemetry-adventure z-[100] pointer-events-none">
+                    <p class="text-[8px] text-zinc-500 uppercase tracking-widest mb-2 italic">Balance de Torque</p>
+                    <span id="txt-grados" class="text-3xl font-black italic text-white">0°</span>
+                </div>
+
+                <div class="hotspot" style="top: 45%; left: 35%;">
+                    <i class="fa-solid fa-gears text-[9px] text-white"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase text-red-600 mb-1">Distribución Desmodrómica</p>
+                        <p>Precisión absoluta en válvulas para máximo rendimiento.</p>
+                    </div>
+                </div>
+                <div class="hotspot" style="top: 65%; left: 50%;">
+                    <i class="fa-solid fa-mountain text-[9px] text-white"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase text-red-600 mb-1">Chasis Pro-MX</p>
+                        <p>Aluminio de alta resistencia con peso ultra-ligero.</p>
+                    </div>
+                </div>
+                <div class="hotspot" style="top: 35%; left: 65%;">
+                    <i class="fa-solid fa-shuttle-space text-[9px] text-white rotate-45"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase text-red-600 mb-1">Suspensión Showa</p>
+                        <p>Ajuste de competición para aterrizajes perfectos.</p>
+                    </div>
+                </div>
+
+                <img id="moto-ducati" src="<%= moto.img %>" alt="<%= moto.nombre %>">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-zinc-950 border-y border-white/5">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-black italic uppercase mb-12 tracking-tighter text-white/20">Technical_Specs</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
+                <div class="p-8 bg-black/40 border border-white/5">
+                    <p class="text-red-600 font-mono text-[10px] mb-2 uppercase tracking-widest italic">// Motor</p>
+                    <p class="text-lg md:text-xl font-black italic uppercase">Monocilíndrico Desmo</p>
+                </div>
+                <div class="p-8 bg-black/40 border border-white/5">
+                    <p class="text-red-600 font-mono text-[10px] mb-2 uppercase tracking-widest italic">// Cilindrada
+                    </p>
+                    <p class="text-lg md:text-xl font-black italic uppercase">449.3 cc</p>
+                </div>
+                <div class="p-8 bg-black/40 border border-white/5">
+                    <p class="text-red-600 font-mono text-[10px] mb-2 uppercase tracking-widest italic">// Peso</p>
+                    <p class="text-lg md:text-xl font-black italic uppercase">110.5 KG (Seco)</p>
+                </div>
+                <div class="p-8 bg-black/40 border border-white/5">
+                    <p class="text-red-600 font-mono text-[10px] mb-2 uppercase tracking-widest italic">// Compresión
+                    </p>
+                    <p class="text-lg md:text-xl font-black italic uppercase">13.5:1</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#050505]">
+        <div class="container mx-auto px-6 flex flex-col lg:flex-row gap-16 items-center">
+            <div class="w-full lg:w-1/2">
+                <h2 class="text-5xl md:text-7xl font-black italic uppercase leading-none mb-6">4 EVER <br><span
+                        class="text-red-600">FACTORY.</span></h2>
+                <p class="text-zinc-500 font-mono text-[11px] uppercase tracking-widest">Garantía oficial Ducati de 4
+                    años para la Desmo 450MX. Soporte total en competición.</p>
+            </div>
+            <div class="w-full lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-8 bg-zinc-900/30 border border-zinc-800"><i
+                        class="fa-solid fa-shield-halved text-red-600 text-xl mb-4"></i>
+                    <p class="text-3xl font-black italic mb-1 text-white">4 AÑOS</p>
+                    <p class="text-[9px] font-black uppercase text-zinc-500 italic">Cobertura Integral</p>
+                </div>
+                <div class="p-8 bg-zinc-900/30 border border-zinc-800"><i
+                        class="fa-solid fa-truck-fast text-red-600 text-xl mb-4"></i>
+                    <p class="text-3xl font-black italic mb-1 text-white">WORLDWIDE</p>
+                    <p class="text-[9px] font-black uppercase text-zinc-500 italic">Asistencia Global</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#050505]">
+        <div class="container mx-auto px-6">
+            <header class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-[10px] font-black tracking-[0.5em] text-red-600 uppercase italic">Multimedia
+                        Exclusiva</h2>
+                    <p class="text-3xl font-black italic uppercase text-white">Desmo <span
+                            class="text-zinc-700">Experience</span></p>
+                </div>
+            </header>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto">
+                <div class="group relative overflow-hidden border border-white/5 h-[300px] md:h-[600px]">
+                    <img src="/img/detalle/Ducati-Desmo450-MX-MY26-overview-hero-short-1600x1000.jpg"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+                <div class="group relative overflow-hidden border border-red-600/20 h-[300px] md:h-[600px]">
+                    <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                        <source src="/img/detalle/desmovideo.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="group relative overflow-hidden border border-white/5 h-[300px] md:h-[600px]">
+                    <img src="/img/detalle/Ducati-Desmo450-MX-MY26-overview-banner-full-1330x600-01.jpg"
+                        class="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-24 border-t border-zinc-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-6xl font-black italic uppercase mb-8 leading-none">¿LISTO PARA DOMINAR <br><span
+                    class="text-red-600 italic">EL CIRCUITO?</span></h2>
+            <button onclick="abrirModal()"
+                class="group relative px-12 py-5 bg-white text-black font-black uppercase text-xs tracking-[0.3em] hover:bg-red-600 hover:text-white transition-all duration-500 italic">
+                Descubrir la Bestia
+                <div
+                    class="absolute -bottom-2 -right-2 w-full h-full border border-red-600/30 -z-10 group-hover:bottom-0 group-hover:right-0 transition-all">
+                </div>
+            </button>
+        </div>
+    </footer>
+
+    <audio id="audio-ducati" preload="auto" loop>
+        <source src="/img/detalle/bobber-motorcycle-409408.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const modal = document.getElementById('modalCompra');
+        const sensor = document.getElementById('sensor-giro');
+        const motoImg = document.getElementById('moto-ducati');
+        const btnStart = document.getElementById('btn-start');
+        const txtGrados = document.getElementById('txt-grados');
+        const audio = document.getElementById('audio-ducati');
+        const selectSede = document.getElementById('selectSede');
+        const displaySede = document.getElementById('sede-display');
+        let telemetryInterval;
+
+        if (selectSede && displaySede) {
+            selectSede.addEventListener('change', () => {
+                displaySede.innerText = selectSede.options[selectSede.selectedIndex].text;
+            });
+        }
+
+        function abrirModal() {
+            const haySesion = "<%= session ? 'true' : 'false' %>" === "true";
+            if (!haySesion) {
+                Swal.fire({
+                    title: '<span style="font-family: \'Inter\'; font-weight: 900;">ACCESO RESTRINGIDO</span>',
+                    html: `<p style="font-family: 'JetBrains Mono'; font-size: 12px; color: #666;">// AUTH_REQUIRED</p><p style="font-family: 'Inter'; font-size: 14px;">Inicia sesión para reservar tu Desmo 450MX.</p>`,
+                    background: '#0a0a0a', color: '#fff', showCancelButton: true, confirmButtonText: 'IR AL LOGIN', confirmButtonColor: '#dc2626',
+                }).then((result) => { if (result.isConfirmed) window.location.href = '/login'; });
+            } else { modal.classList.remove('hidden'); }
+        }
+
+        function cerrarModal() { modal.classList.add('hidden'); }
+
+        function handleRotation(clientX) {
+            if (!sensor) return;
+            const rect = sensor.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const rotation = ((x / rect.width) - 0.5) * 60;
+            motoImg.style.transform = `rotateY(${rotation}deg)`;
+            motoImg.style.setProperty('--rot', `${rotation}deg`);
+            txtGrados.innerText = `${Math.round(rotation)}°`;
+            document.querySelectorAll('.hotspot').forEach(h => {
+                h.style.marginLeft = `${rotation * -0.2}px`;
+            });
+        }
+
+        if (sensor && motoImg) {
+            sensor.addEventListener('mousemove', (e) => handleRotation(e.clientX));
+            sensor.addEventListener('touchmove', (e) => {
+                handleRotation(e.touches[0].clientX);
+            }, { passive: true });
+
+            const resetRotation = () => {
+                motoImg.style.transform = 'rotateY(0deg)';
+                motoImg.style.setProperty('--rot', `0deg`);
+                txtGrados.innerText = `0°`;
+                document.querySelectorAll('.hotspot').forEach(h => h.style.marginLeft = `0px`);
+            };
+            sensor.addEventListener('mouseleave', resetRotation);
+            sensor.addEventListener('touchend', resetRotation);
+        }
+
+        btnStart.addEventListener('click', () => {
+            const isOn = document.body.classList.toggle('engine-on');
+            if (isOn) {
+                audio?.play().catch(() => { });
+                btnStart.querySelector('i').className = 'fa-solid fa-stop text-xl text-white';
+                motoImg.classList.add('vibrando');
+                telemetryInterval = setInterval(() => {
+                    document.getElementById('val-rpm').innerText = Math.floor(Math.random() * (13200 - 12500) + 12500);
+                    document.getElementById('val-temp').innerText = Math.floor(Math.random() * (98 - 92) + 92) + '°C';
+                }, 100);
+            } else {
+                audio?.pause();
+                btnStart.querySelector('i').className = 'fa-solid fa-bolt text-xl text-zinc-600';
+                motoImg.classList.remove('vibrando');
+                clearInterval(telemetryInterval);
+                document.getElementById('val-rpm').innerText = '0';
+                document.getElementById('val-temp').innerText = '22°C';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => { if (e.key === "Escape") cerrarModal(); });
+    </script>
+</body>
+
+</html>

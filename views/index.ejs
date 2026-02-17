@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducati | Pasión Roja</title>
+    <link rel="icon" type="image/png" href="/img/logo/logo.png">
+    <link rel="apple-touch-icon" href="/img/logo/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        html {
+            scroll-behavior: smooth;
+
+        }
+
+
+        section {
+            scroll-margin-top: 80px;
+        }
+
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+
+        .group:hover .group-hover\:rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+
+<body class="bg-black text-white font-sans overflow-x-hidden">
+
+    <nav class="fixed top-0 w-full z-[100] bg-black/95 backdrop-blur-md border-b border-zinc-800 px-4 md:px-12 py-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <a href="#inicio" class="flex-shrink-0">
+                    <img src="/img/logo/logo.png" alt="Ducati" class="h-8 md:h-10 w-auto">
+                </a>
+
+                <ul class="hidden lg:flex gap-8 uppercase text-[10px] font-bold tracking-[0.2em] text-zinc-400">
+                    <li><a href="#inicio" class="hover:text-red-600 transition-colors">Inicio</a></li>
+                    <li><a href="#modelos" class="hover:text-red-600 transition-colors">Modelos</a></li>
+                    <li><a href="#nosotros" class="hover:text-red-600 transition-colors">Nosotros</a></li>
+                    <li><a href="#sucursales" class="hover:text-red-600 transition-colors">Sucursales</a></li>
+                </ul>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="btn-menu" class="lg:hidden text-white text-2xl focus:outline-none order-2">
+                    <i class="fa-solid fa-bars-staggered" id="icon-menu"></i>
+                </button>
+
+                <div class="hidden lg:flex items-center gap-6">
+                    <% if (typeof user !=='undefined' && user) { %>
+                        <div class="flex flex-col items-end border-r border-zinc-800 pr-6">
+                            <span class="text-[10px] text-red-600 font-black uppercase italic">
+                                Comandante <%= user.username %>
+                            </span>
+                            <div class="flex gap-4">
+                                <a href="/perfil"
+                                    class="text-[8px] text-white hover:text-red-600 uppercase font-bold tracking-tighter">Mi
+                                    Perfil</a>
+                                <span class="text-[8px] text-zinc-500 uppercase tracking-tighter">Modo: <%= user.role %>
+                                </span>
+                            </div>
+                        </div>
+                        <a href="/logout"
+                            class="uppercase text-[10px] font-bold tracking-widest text-zinc-400 hover:text-red-600 transition">Salir</a>
+                        <% } else { %>
+                            <a href="/login"
+                                class="uppercase text-[10px] font-bold tracking-widest text-zinc-300">Login</a>
+                            <a href="/registro"
+                                class="bg-red-600 text-white px-6 py-2.5 rounded-sm uppercase text-[10px] font-black tracking-widest hover:bg-white hover:text-red-600 transition-all">Registrarse</a>
+                            <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div id="menu-mobile"
+            class="hidden lg:hidden w-full bg-black/95 absolute top-full left-0 border-b border-zinc-800 animate-fade-in-down">
+            <ul class="flex flex-col p-8 gap-6 uppercase text-center font-bold tracking-[0.2em] text-sm">
+                <li><a href="#inicio" onclick="toggleMenu()" class="text-white hover:text-red-600">Inicio</a></li>
+                <li><a href="#modelos" onclick="toggleMenu()" class="text-white hover:text-red-600">Modelos</a></li>
+                <li><a href="#nosotros" onclick="toggleMenu()" class="text-white hover:text-red-600">Nosotros</a></li>
+                <li><a href="#sucursales" onclick="toggleMenu()" class="text-white hover:text-red-600">Sucursales</a>
+                </li>
+
+                <hr class="border-zinc-800">
+
+                <% if (typeof user !=='undefined' && user) { %>
+                    <li class="text-red-600 italic">Comandante <%= user.username %>
+                    </li>
+                    <li><a href="/perfil" class="text-zinc-400">Mi Perfil</a></li>
+                    <% if (user.role==='admin' ) { %>
+                        <li><a href="/admin" class="bg-red-600 text-white py-2 rounded-sm">Acceder al Box</a></li>
+                        <% } %>
+                            <li><a href="/logout" class="text-zinc-600">Cerrar Sesión</a></li>
+                            <% } else { %>
+                                <li><a href="/login" class="text-white">Login</a></li>
+                                <li><a href="/registro" class="text-red-600">Registrarse</a></li>
+                                <% } %>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="inicio" class="relative h-[85vh] w-full overflow-hidden bg-black pt-16">
+        <div id="slider" class="flex h-full w-[300%] transition-transform duration-1000 ease-in-out">
+            <div class="w-[33.333%] h-full relative flex-shrink-0">
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
+                <img src="/img/detalle/icon.png" class="h-full w-full object-cover md:object-contain">
+                <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+                    <p
+                        class="text-red-600 text-sm md:text-2xl tracking-[0.3em] md:tracking-[0.5em] uppercase font-bold mb-4">
+                        ESTILO ITALIANO</p>
+                    <h2 class="text-4xl md:text-9xl font-black italic uppercase tracking-tighter leading-tight">
+                        BIENVENIDO A <span class="text-white">DUCATI</span></h2>
+                </div>
+            </div>
+            <div class="w-[33.333%] h-full relative flex-shrink-0">
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
+                <img src="/img/detalle/Panigale-V4-R-overview-gallery-mosaic-1920x1080-4.jpg"
+                    class="w-full h-full object-cover md:object-contain">
+                <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+                    <h2 class="text-4xl md:text-9xl font-black italic uppercase tracking-tighter leading-tight">
+                        TECNOLOGÍA <span class="text-red-600">DESMO</span></h2>
+                </div>
+            </div>
+            <div class="w-[33.333%] h-full relative flex-shrink-0">
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
+                <img src="/img/detalle/monster-overview-banner-full-1330x600.jpg"
+                    class="w-full h-full object-cover md:object-contain">
+                <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+                    <h2 class="text-4xl md:text-9xl font-black italic uppercase tracking-tighter leading-tight">ÚNETE A
+                        LA <span class="text-red-600">FAMILIA</span></h2>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="modelos" class="py-12 md:py-20 px-6 md:px-10 bg-zinc-950">
+        <h3 class="text-2xl md:text-3xl font-black uppercase italic mb-12 border-l-4 border-red-600 pl-4 text-white">
+            Modelos Disponibles
+        </h3>
+
+        <div id="contenedor-motos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            <% motos.forEach(moto=> { %>
+                <% let precioLimpio=moto.precio.toString().replace('€', '' ).trim(); %>
+
+                    <div class="group h-96 [perspective:1000px]">
+                        <div
+                            class="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] group-active:[transform:rotateY(180deg)]">
+
+                            <div
+                                class="absolute inset-0 [backface-visibility:hidden] bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col items-center justify-center">
+                                <img src="<%= moto.img %>" alt="<%= moto.nombre %>"
+                                    class="w-full h-40 object-contain mb-4">
+                                <h4 class="text-xl font-black italic uppercase text-white text-center">
+                                    <%= moto.nombre %>
+                                </h4>
+                                <p class="text-red-600 font-black mt-2 text-lg">
+                                    € <%= precioLimpio %>
+                                </p>
+                                <div
+                                    class="mt-6 text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500 flex items-center gap-2 border-t border-zinc-800 pt-4">
+                                    <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                                    <span class="hidden md:inline">Coloca el cursor para info</span>
+                                    <span class="inline md:hidden">Toca para ver info</span>
+                                </div>
+                            </div>
+
+                            <div
+                                class="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-red-600 rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                                <h4 class="text-2xl font-black italic uppercase text-white mb-4">
+                                    <%= moto.nombre %>
+                                </h4>
+                                <div class="space-y-2 text-white/90 uppercase text-xs font-bold tracking-widest">
+                                    <p>Motor: <span class="text-black font-extrabold">
+                                            <%= moto.motor %>
+                                        </span></p>
+                                    <p>Potencia: <span class="text-black font-extrabold">
+                                            <%= moto.potencia %>
+                                        </span></p>
+                                    <p class="mt-2 text-white/50 text-[10px]">
+                                        PRECIO FINAL: € <%= precioLimpio %>
+                                    </p>
+                                </div>
+                                <a href="/moto/<%= moto._id %>" onclick="return verificarAcceso(event)"
+                                    class="mt-8 px-8 py-3 bg-white text-red-600 font-black uppercase text-[10px] tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-500 shadow-xl inline-block">
+                                    DESCUBRIR LA BESTIA
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <% }); %>
+        </div>
+    </section>
+
+    <section id="nosotros" class="bg-[#0a0a0a] py-16 md:py-32 text-zinc-300">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center mb-20 md:mb-40">
+                <div class="relative">
+                    <div
+                        class="absolute -top-10 -left-5 md:-left-10 text-6xl md:text-[15rem] font-black text-white/[0.03] select-none uppercase">
+                        DUCATI</div>
+                    <h2
+                        class="text-red-600 text-xs tracking-[0.5em] md:tracking-[0.8em] uppercase mb-6 text-center md:text-left">
+                        Nosotros</h2>
+                    <h3 class="text-3xl md:text-5xl font-light text-white italic mb-8 text-center md:text-left">Más que
+                        una marca, <br>una <span class="font-bold">Emoción.</span></h3>
+                    <p class="leading-relaxed mb-6 font-light text-base md:text-lg">
+                        Fundada en el corazón de Bolonia, Ducati representa la síntesis perfecta entre la tecnología de
+                        vanguardia y el diseño italiano más puro. No somos solo fabricantes de motocicletas; somos los
+                        guardianes de una tradición de rendimiento que ha definido el estándar mundial por casi un
+                        siglo.
+                    </p>
+                    <p class="leading-relaxed font-light text-zinc-500">
+                        Nuestra identidad se forja en los circuitos y se perfecciona en las carreteras de todo el mundo,
+                        llevando el espíritu de "Borgo Panigale" a cada rincón del planeta.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="/img/nosotros/2025-10-01_WDW2026-02-Dual-Media-820x924.jpg"
+                        class="rounded-sm grayscale hover:grayscale-0 transition-all duration-700 h-48 md:h-64 w-full object-cover">
+                    <img src="/img/nosotros/marc.jpg"
+                        class="rounded-sm grayscale hover:grayscale-0 transition-all duration-700 h-48 md:h-64 w-full object-cover mt-6 md:mt-12">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border border-zinc-900">
+                <div class="p-8 md:p-16 border-b md:border-b-0 md:border-r border-zinc-900 bg-zinc-950/50">
+                    <div class="w-12 h-1 bg-red-600 mb-8"></div>
+                    <h4 class="text-2xl font-bold text-white uppercase tracking-tighter mb-6">Misión</h4>
+                    <p class="text-zinc-400 font-light leading-relaxed italic text-sm md:text-base">
+                        "Nuestra misión es crear motocicletas únicas que ofrezcan experiencias inigualables de
+                        conducción. Nos comprometemos a entregar la máxima tecnología desmodrómica combinada con un
+                        diseño que robe el aliento."
+                    </p>
+                </div>
+                <div class="p-8 md:p-16 bg-zinc-950/50">
+                    <div class="w-12 h-1 bg-zinc-700 mb-8"></div>
+                    <h4 class="text-2xl font-bold text-white uppercase tracking-tighter mb-6">Visión</h4>
+                    <p class="text-zinc-400 font-light leading-relaxed italic text-sm md:text-base">
+                        "Ser reconocidos globalmente como la marca más deseada del motociclismo premium. Aspiramos a
+                        liderar la innovación tecnológica y la sostenibilidad en el alto rendimiento."
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-24 md:mt-40">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-zinc-900 pb-8">
+                    <div>
+                        <h3 class="text-white text-2xl md:text-3xl font-light italic uppercase">
+                            The <span class="text-red-600 font-bold">Experience</span>
+                        </h3>
+                        <p class="text-zinc-500 text-[10px] tracking-widest uppercase mt-2">La marca en su estado puro
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div
+                        class="md:col-span-2 overflow-hidden group relative border border-zinc-800 hover:border-red-600 transition-colors duration-500">
+                        <div
+                            class="absolute inset-0 bg-black/20 group-hover:bg-transparent z-10 transition-all duration-500">
+                        </div>
+                        <img src="/img/nosotros/2025-10-01_WDW2026-gallery-mosaic-1920x1080-03.jpg"
+                            class="w-full h-64 md:h-80 object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out">
+                        <span
+                            class="absolute bottom-4 left-4 z-20 text-[8px] text-white font-black opacity-0 group-hover:opacity-100 transition-opacity uppercase italic tracking-widest">World
+                            Ducati Week</span>
+                    </div>
+
+                    <div
+                        class="overflow-hidden group relative border border-zinc-800 hover:border-red-600 transition-colors duration-500">
+                        <div
+                            class="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/10 z-10 transition-all duration-500">
+                        </div>
+                        <img src="/img/nosotros/test-valencia-dual-media-card-800x924-01.jpg"
+                            class="w-full h-64 md:h-80 object-cover grayscale group-hover:grayscale-0 transform group-hover:scale-105 transition-all duration-700">
+                    </div>
+
+                    <div
+                        class="overflow-hidden group relative border border-zinc-800 hover:border-red-600 transition-colors duration-500">
+                        <div
+                            class="absolute inset-0 bg-black/40 group-hover:bg-transparent z-10 transition-all duration-500">
+                        </div>
+                        <img src="/img/nosotros/test-valencia-editorial-image-wide-1330x768-02.jpg"
+                            class="w-full h-64 md:h-80 object-cover transform group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="sucursales" class="bg-black py-16 md:py-32 border-t border-zinc-900">
+        <div class="container mx-auto px-6">
+            <div class="mb-12 md:mb-20">
+                <h2
+                    class="text-red-600 text-[10px] md:text-xs tracking-[0.5em] md:tracking-[0.8em] uppercase mb-4 text-center md:text-left">
+                    Ducati Network
+                </h2>
+                <h3 class="text-3xl md:text-6xl font-black italic uppercase text-white text-center md:text-left">
+                    Presenza <span class="text-zinc-500">Globale</span>
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">VENEZUELA</p>
+                        <img src="https://flagcdn.com/w40/ve.png" alt="Venezuela" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Caracas</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"El epicentro del estilo italiano en la
+                        capital. Pasión desmodrómica en Las Mercedes."</p>
+                    <a href="https://maps.google.com/?cid=15026380789255752418&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">Ver Mapa</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">ITALIA</p>
+                        <img src="https://flagcdn.com/w40/it.png" alt="Italia" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Roma</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"L'essenza di Borgo Panigale nella Città
+                        Eterna. Dove il design incontra la historia."</p>
+                    <a href="https://maps.google.com/?cid=13226793415411368047&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">Vedi Mappa</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">ESPAÑA</p>
+                        <img src="https://flagcdn.com/w40/es.png" alt="España" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Madrid</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"Pura emoción en el corazón de la península.
+                        Rendimiento sin concesiones en Madrid."</p>
+                    <a href="https://maps.google.com/?cid=9617120818740120225&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">Ver Mapa</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">USA</p>
+                        <img src="https://flagcdn.com/w40/us.png" alt="USA" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Miami</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"Premium performance under the Florida sun.
+                        Exclusive design in Coral Gables."</p>
+                    <a href="https://maps.google.com/?cid=5186843564642692603&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">View Map</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">JAPAN</p>
+                        <img src="https://flagcdn.com/w40/jp.png" alt="Japón" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Tokyo</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"渋谷区。日本の道にイタリアの情熱を。究極のテクノロジー。"</p>
+                    <a href="https://maps.google.com/?cid=7605591351090687837&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">地図を見る</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">GERMANY</p>
+                        <img src="https://flagcdn.com/w40/de.png" alt="Alemania" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Munich</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6">"Spitzentechnologie im Herzen Bayerns. Pure
+                        desmodromische Kraft."</p>
+                    <a href="https://maps.google.com/?cid=8528849845411368296&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">Karte
+                        ansehen</a>
+                </div>
+
+                <div
+                    class="group bg-zinc-950 border border-zinc-900 p-8 rounded-sm hover:border-red-600 transition-all duration-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-red-600 font-bold text-[10px] tracking-widest">UAE</p>
+                        <img src="https://flagcdn.com/w40/ae.png" alt="EAU" class="w-6">
+                    </div>
+                    <h4 class="text-white text-2xl font-black italic uppercase mb-4">Dubai</h4>
+                    <p class="text-zinc-500 text-sm font-light italic mb-6" dir="rtl">"الفخامة والسرعة في مدينة
+                        المستقبل. دبي ترحب بـ دوكاتي."</p>
+                    <a href="https://maps.google.com/?cid=6772617026047479550&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ"
+                        target="_blank"
+                        class="text-white text-[10px] font-bold uppercase border-b border-red-600 pb-1">عرض الخريطة</a>
+                </div>
+            </div>
+
+            <div class="mt-24 py-16 border-t border-zinc-900 text-center relative overflow-hidden">
+                <div class="relative z-10">
+                    <h4
+                        class="text-zinc-800 text-[10vw] md:text-[12vw] font-black italic leading-none opacity-20 absolute -top-5 md:-top-10 left-1/2 -translate-x-1/2 w-full whitespace-nowrap">
+                        BORGO PANIGALE
+                    </h4>
+                    <h5 class="text-2xl md:text-5xl font-black italic uppercase relative z-20 text-white px-4">THE RED
+                        <span class="text-red-600">PASSION</span> NEVER STOPS.
+                    </h5>
+                    <p class="text-zinc-500 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mt-6">Evolution ·
+                        Performance · Victory</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="bg-[#050505] pt-20 pb-10 border-t border-zinc-900">
+        <div class="container mx-auto px-6 text-center md:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+                <div>
+                    <img src="/img/logo/logo.png" alt="Ducati" class="h-10 mb-8 mx-auto md:mx-0">
+                    <p class="text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Desde 1926, diseñamos sueños sobre
+                        dos ruedas en Borgo Panigale, Italia. Nuestra ingeniería es <span
+                            class="text-white font-bold italic">emoción desmodrómica</span> pura.</p>
+                </div>
+                <div>
+                    <h5
+                        class="text-white text-[11px] font-black uppercase mb-8 border-b border-red-600 w-fit pb-1 mx-auto md:mx-0">
+                        Navegación</h5>
+                    <ul class="space-y-4 text-zinc-500 text-[13px] font-bold uppercase tracking-widest">
+                        <li><a href="#inicio" class="hover:text-red-600 transition-colors">Volver al Inicio</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div>
+                        <h5
+                            class="text-white text-[11px] font-black uppercase tracking-[0.3em] mb-8 border-b border-zinc-800 w-fit pb-1 mx-auto md:mx-0">
+                            Conecta con Nosotros
+                        </h5>
+                        <div class="flex justify-center md:justify-start gap-4 mb-8">
+                            <a href="https://www.instagram.com/ducati" target="_blank"
+                                class="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center hover:bg-red-600 hover:border-red-600 transition-all duration-300 group">
+                                <i
+                                    class="fa-brands fa-instagram text-zinc-400 group-hover:text-white transition-colors text-lg"></i>
+                            </a>
+                            <a href="https://www.facebook.com/Ducati" target="_blank"
+                                class="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center hover:bg-[#1877F2] hover:border-[#1877F2] transition-all duration-300 group">
+                                <i
+                                    class="fa-brands fa-facebook-f text-zinc-400 group-hover:text-white transition-colors text-lg"></i>
+                            </a>
+                            <a href="https://www.youtube.com/user/DucatiMotorHolding" target="_blank"
+                                class="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center hover:bg-red-600 hover:border-red-600 transition-all duration-300 group">
+                                <i
+                                    class="fa-brands fa-youtube text-zinc-400 group-hover:text-white transition-colors text-lg"></i>
+                            </a>
+                        </div>
+                        <p class="text-[9px] text-zinc-600 uppercase tracking-widest leading-relaxed">
+                            © 2026 Ducati Motor Holding S.p.A - A Sole Shareholder Company - AUDI AG Group.
+                        </p>
+                    </div>
+                </div>
+                <p class="text-[9px] text-zinc-600 uppercase tracking-widest">© 2026 Ducati Motor Holding S.p.A -
+                    AUDI AG Group.</p>
+            </div>
+        </div>
+        <div class="pt-8 border-t border-zinc-900/50 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex gap-4 text-zinc-700 text-[8px] font-black uppercase">
+                <a href="#">Política de Cookies</a><a href="#">Aviso Legal</a><a href="#">Privacidad</a>
+            </div>
+            <div class="text-zinc-800 text-[10px] font-black italic">TODO ES <span class="text-red-900/40">DUCATI</span>
+            </div>
+        </div>
+        </div>
+    </footer>
+
+    <script>
+        async function editarPrecio(id) {
+            const nuevoPrecio = prompt("💵 Ingrese el nuevo precio (USD) para esta Ducati:");
+            if (nuevoPrecio && !isNaN(nuevoPrecio)) {
+                try {
+                    const response = await fetch(`/api/motos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ precio: nuevoPrecio })
+                    });
+                    if (response.ok) location.reload();
+                    else alert("❌ Error al actualizar.");
+                } catch (err) { console.error(err); }
+            }
+        }
+
+        async function eliminarMoto(id) {
+            if (confirm("⚠️ ¿Eliminar este modelo?")) {
+                try {
+                    const response = await fetch(`/api/motos/${id}`, { method: 'DELETE' });
+                    if (response.ok) location.reload();
+                    else alert("❌ Error al eliminar.");
+                } catch (err) { console.error(err); }
+            }
+        }
+
+        const btnMenu = document.getElementById('btn-menu');
+        const menuMobile = document.getElementById('menu-mobile');
+        const iconMenu = document.getElementById('icon-menu');
+
+        function toggleMenu() {
+
+            menuMobile.classList.toggle('hidden');
+
+
+            if (menuMobile.classList.contains('hidden')) {
+                iconMenu.classList.replace('fa-xmark', 'fa-bars-staggered');
+            } else {
+                iconMenu.classList.replace('fa-bars-staggered', 'fa-xmark');
+            }
+        }
+
+        btnMenu.addEventListener('click', toggleMenu);
+    </script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

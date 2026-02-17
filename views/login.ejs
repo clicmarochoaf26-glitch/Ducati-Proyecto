@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducati | Login</title>
+    <link rel="icon" type="image/png" href="/img/logo/logo.png">
+    <link rel="apple-touch-icon" href="/img/logo/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap');
+
+        body {
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .carbon-panel {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+        }
+
+        .input-ducati {
+            background: #0f0f0f;
+            border: 1px solid #222;
+            transition: all 0.3s ease;
+        }
+
+        .input-ducati:focus {
+            border-color: #e31837;
+            box-shadow: 0 0 15px rgba(227, 24, 55, 0.1);
+            outline: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .welcome-banner {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        
+        .swal2-popup {
+            width: 90% !important;
+            max-width: 450px !important;
+        }
+    </style>
+</head>
+
+<body class="text-white min-h-screen flex items-center justify-center px-4 md:px-6 py-10">
+
+    <div class="w-full max-w-md carbon-panel p-6 md:p-10 rounded-sm shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-red-600"></div>
+
+        <% if (typeof query !=='undefined' && query.success) { %>
+            <% let titulo="¡BIENVENIDO AL EQUIPO!" ; let subtexto="Cuenta activada. Ya puedes entrar al Box." ; const
+                pais=query.pais ? query.pais.toLowerCase() : '' ; if (pais.includes('italia') || pais==='it' ) {
+                titulo="BENVENUTO NELLA SQUADRA!" ; subtexto="Account attivato. Puoi entrare nei box." ; } else if
+                (pais.includes('japon') || pais.includes('japón') || pais==='jp' ) { titulo="チームへようこそ！" ;
+                subtexto="アカウントが有効化されました。" ; } else if (pais.includes('alemania') || pais==='de' ) {
+                titulo="WILLKOMMEN IM TEAM!" ; subtexto="Konto aktiviert. Sie können jetzt eintreten." ; } else if
+                (pais.includes('usa') || pais.includes('uk') || pais.includes('inglaterra') || pais==='en' ) {
+                titulo="WELCOME TO THE TEAM!" ; subtexto="Account activated. You can now enter the pits." ; } %>
+                <div id="welcome-msg"
+                    class="welcome-banner bg-red-600/10 border border-red-600 p-4 mb-8 text-center rounded-sm">
+                    <h2 class="text-red-600 font-black italic text-xs md:text-sm uppercase tracking-tighter">
+                        <%= titulo %>
+                    </h2>
+                    <p class="text-[9px] md:text-[10px] text-zinc-400 uppercase mt-1">
+                        <%= subtexto %>
+                    </p>
+                </div>
+                <script>
+                    setTimeout(() => {
+                        const msg = document.getElementById('welcome-msg');
+                        if (msg) {
+                            msg.style.transition = "opacity 0.5s";
+                            msg.style.opacity = "0";
+                            setTimeout(() => msg.remove(), 500);
+                        }
+                    }, 5000);
+                </script>
+                <% } %>
+
+                    <div class="text-center mb-8 md:mb-12">
+                        <h1 class="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-none">
+                            DUCATI <span class="text-red-600">CORSE</span>
+                        </h1>
+                        <p
+                            class="text-zinc-500 text-[8px] md:text-[9px] tracking-[0.4em] md:tracking-[0.6em] uppercase font-bold mt-4">
+                            Área de Pilotos Oficiales
+                        </p>
+                    </div>
+
+                    <form action="/login" method="POST" class="space-y-5 md:space-y-6">
+                        <div>
+                            <label
+                                class="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                                Nombre de Usuario
+                            </label>
+                            <input type="text" name="username" required
+                                class="w-full input-ducati p-3 md:p-4 text-sm rounded-sm text-white placeholder-zinc-700"
+                                placeholder="Escribe tu usuario">
+                        </div>
+
+                        <div class="relative group">
+                            <label
+                                class="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                                Contraseña
+                            </label>
+                            <div class="relative">
+                                <input type="password" name="password" id="passInput" required
+                                    class="w-full input-ducati p-3 md:p-4 text-sm rounded-sm text-white placeholder-zinc-700 pr-12"
+                                    placeholder="••••••••">
+                                <div id="togglePass"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-600 hover:text-red-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-red-600 hover:bg-white hover:text-black text-white font-black py-3 md:py-4 rounded-sm uppercase italic text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.3em] transition-all duration-500">
+                            Entrar al Box
+                        </button>
+                    </form>
+
+                    <div class="mt-8 md:mt-10 pt-6 border-t border-zinc-900 text-center">
+                        <a href="/registro"
+                            class="text-zinc-500 font-bold text-[9px] md:text-[10px] uppercase hover:text-red-600 transition">
+                            ¿No tienes cuenta? Regístrate
+                        </a>
+                    </div>
+    </div>
+
+    <script>
+        const passInput = document.getElementById('passInput');
+        const toggleBtn = document.getElementById('togglePass');
+
+        
+        toggleBtn.addEventListener('mouseenter', () => { if (window.innerWidth > 768) passInput.type = 'text'; });
+        toggleBtn.addEventListener('mouseleave', () => { if (window.innerWidth > 768) passInput.type = 'password'; });
+        toggleBtn.addEventListener('click', () => {
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        
+        if (urlParams.get('error') === 'true') {
+            Swal.fire({
+                title: '<span style="font-family: \'Inter\', sans-serif; font-weight: 900; letter-spacing: -1px; font-size: 1.2rem;">FALLO DE AUTENTICACIÓN</span>',
+                html: `
+                    <div style="border-top: 1px solid #333; margin-top: 10px; padding-top: 15px;">
+                        <p style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #e11d48; margin-bottom: 10px;">// ERROR_CODE: AUTH_INVALID</p>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #888; line-height: 1.4;">
+                            Usuario o clave no reconocidos. Verifica tus datos de acceso.
+                        </p>
+                    </div>
+                `,
+                background: '#080808',
+                color: '#ffffff',
+                confirmButtonText: 'REINTENTAR',
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'border border-zinc-800 rounded-none' }
+            }).then(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+
+        
+        if (urlParams.get('logout') === 'true') {
+            Swal.fire({
+                title: '<span style="font-family: \'Inter\', sans-serif; font-weight: 900; letter-spacing: -1px; color: #ffffff; font-size: 1.2rem;">MOTORES APAGADOS</span>',
+                html: `
+                    <div style="border-top: 1px solid #333; margin-top: 10px; padding-top: 15px;">
+                        <p style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #52525b; margin-bottom: 10px;">// STATUS: SECURED</p>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #888; line-height: 1.4;">
+                            Garaje protegido. ¡Buon Viaggio!
+                        </p>
+                    </div>
+                `,
+                background: '#080808',
+                color: '#ffffff',
+                confirmButtonText: 'ENTENDIDO',
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'border border-zinc-800 rounded-none' }
+            }).then(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+    </script>
+</body>
+
+</html>

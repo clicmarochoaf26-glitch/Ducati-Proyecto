@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducati <%= moto.nombre %> | Official Experience</title>
+    <link rel="icon" type="image/png" href="/img/logo/logo.png">
+    <link rel="apple-touch-icon" href="/img/logo/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050505;
+            background-image:
+                linear-gradient(rgba(220, 38, 38, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(220, 38, 38, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .btn-nav-garage {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .btn-nav-garage:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+        }
+
+        /* --- HOTSPOTS NEÓN --- */
+        .hotspot {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #ccff00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 300 !important;
+            /* Aumentado para estar sobre todo */
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: scale(0);
+            box-shadow: 0 0 20px rgba(204, 255, 0, 0.8);
+            pointer-events: auto !important;
+            /* Asegura clic */
+        }
+
+        .engine-on .hotspot {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hotspot i {
+            color: #000;
+            font-size: 9px;
+            transition: transform 0.3s;
+        }
+
+        .hotspot:hover i {
+            transform: rotate(90deg);
+        }
+
+        .hotspot::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #ccff00;
+            border-radius: 50%;
+            animation: pulse-neon 1.5s infinite;
+        }
+
+        @keyframes pulse-neon {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(3.5);
+                opacity: 0;
+            }
+        }
+
+        .hotspot-card {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            background: #fff;
+            color: #000;
+            padding: 15px;
+            border-left: 5px solid #ccff00;
+            font-size: 11px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 310;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Soporte para hover y para clase activa en móvil */
+        .hotspot:hover .hotspot-card,
+        .hotspot.active .hotspot-card {
+            opacity: 1;
+            visibility: visible;
+            bottom: 45px;
+        }
+
+        /* --- TELEMETRÍA & ENGINE --- */
+        .telemetry-adventure {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 3px solid #dc2626;
+            padding: 15px 25px;
+            backdrop-blur: 10px;
+            z-index: 400;
+        }
+
+        .pointer-start {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #ccff00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: bounceY 2s infinite;
+        }
+
+        @keyframes bounceY {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        .wrapper-360 {
+            perspective: 1500px;
+            width: 100%;
+            height: 550px;
+            position: relative;
+            z-index: 50;
+            touch-action: none;
+            /* Evita scroll mientras giras la moto */
+        }
+
+        #moto-ducati {
+            width: 100%;
+            max-width: 850px;
+            transition: transform 0.15s ease-out, filter 1s ease;
+            filter: brightness(0.15) grayscale(100%) contrast(1.2);
+            pointer-events: none;
+            /* IMPORTANTE: La imagen no bloquea los clics */
+            user-select: none;
+        }
+
+        .engine-on #moto-ducati {
+            filter: brightness(1.1) grayscale(0%) contrast(1);
+        }
+
+        .vibrando {
+            animation: vibration-mx 0.04s infinite;
+        }
+
+        @keyframes vibration-mx {
+            0% {
+                transform: translate(0, 0) rotateY(var(--rot, 0deg));
+            }
+
+            50% {
+                transform: translate(0.5px, -0.5px) rotateY(var(--rot, 0deg));
+            }
+
+            100% {
+                transform: translate(0, 0) rotateY(var(--rot, 0deg));
+            }
+        }
+
+        .btn-adquirir {
+            background: #dc2626;
+            color: #fff;
+            padding: 18px 45px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            border: 1px solid #dc2626;
+            font-style: italic;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-adquirir:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .floor-glow {
+            position: absolute;
+            bottom: 15%;
+            width: 600px;
+            height: 120px;
+            background: radial-gradient(ellipse, rgba(220, 38, 38, 0.25) 0%, transparent 75%);
+            filter: blur(40px);
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            pointer-events: none;
+            /* No bloquea clics */
+        }
+
+        .engine-on .floor-glow {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="modalCompra"
+        class="fixed inset-0 z-[5000] hidden bg-black/98 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-white/10 w-full max-w-lg p-12 relative shadow-2xl">
+            <div class="absolute top-0 right-0 p-4">
+                <button onclick="cerrarModal()" class="text-zinc-500 hover:text-white transition text-2xl">×</button>
+            </div>
+            <h3 class="text-4xl font-black uppercase italic mb-10 leading-none">RESERVA<br><span
+                    class="text-red-600 underline decoration-1 underline-offset-8">OFICIAL</span></h3>
+            <form action="/comprar/<%= moto._id %>" method="POST" class="space-y-8">
+                <div>
+                    <label class="text-[8px] font-black uppercase text-zinc-500 block mb-2 italic">Concesionario
+                        Oficial</label>
+                    <select id="selectSede" name="sedeElegida" required
+                        class="w-full bg-zinc-900 border border-zinc-800 p-4 text-xs font-bold text-white outline-none focus:border-red-600 appearance-none cursor-pointer">
+                        <option value="Caracas, Venezuela">Garage Las Mercedes, Caracas</option>
+                        <option value="Roma, Italia">Ducati Italia, Roma</option>
+                        <option value="Madrid, España">Ducati España, Madrid</option>
+                        <option value="Miami, Usa">Ducati USA, Miami </option>
+                        <option value="Tokyo, Japan">Ducati Tokyo, Nishi</option>
+                        <option value="Dubai, UAE">Ducati Dubai, Wheels of Arabia</option>
+                        <option value="Dubai, UAE">Ducati Germany, Munich</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold uppercase text-red-600 block mb-3 tracking-widest">Fecha de
+                        Protocolo</label>
+                    <input type="date" required
+                        class="w-full bg-zinc-900 border border-white/5 p-5 text-xs font-bold text-white outline-none focus:border-red-600 transition">
+                </div>
+                <div class="border-y border-white/5 py-6 flex justify-between items-center">
+                    <p class="text-[11px] uppercase font-mono text-zinc-500">Valor de Adquisición:</p>
+                    <p class="text-3xl font-black italic text-white">
+                        <%= moto.precio %>
+                    </p>
+                </div>
+                <button type="submit"
+                    class="w-full bg-red-600 text-white py-5 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500">Confirmar
+                    Transacción</button>
+            </form>
+        </div>
+    </div>
+
+    <audio id="audio-ducati" preload="auto">
+        <source src="/img/detalle/motorcycle-ducati-monster-82973.mp3" type="audio/mpeg">
+    </audio>
+
+    <nav
+        class="fixed top-0 w-full z-[500] bg-black/80 backdrop-blur-lg border-b border-white/5 p-6 flex justify-between items-center">
+        <div class="flex items-center gap-8">
+            <a href="/"><img src="/img/logo/logo.png" class="h-6"></a>
+            <a href="/" class="btn-nav-garage">
+                <i class="fa-solid fa-arrow-left-long text-[10px]"></i>
+                <span>Volver al Inicio</span>
+            </a>
+        </div>
+        <div class="hidden md:flex flex-col items-end">
+            <span class="text-[10px] font-black text-white italic uppercase tracking-tighter">
+                <%= moto.nombre %>
+            </span>
+            <span class="text-[8px] font-mono text-red-600 tracking-[0.3em] uppercase">2026 Official Division</span>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
+        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div>
+                <h2 class="text-red-600 font-black text-xs tracking-[0.5em] uppercase mb-4 italic">// Engine Start
+                    Protocol</h2>
+                <h1 class="text-7xl md:text-9xl font-black italic mb-8 uppercase leading-[0.85] tracking-tighter">DOMINA
+                    LA <br><span class="text-red-600">BESTIA.</span></h1>
+
+                <div class="flex items-center gap-8 mb-12">
+                    <div class="relative">
+                        <div class="pointer-start font-black"><i
+                                class="fa-solid fa-chevron-down mb-2 block text-center"></i>Encender</div>
+                        <button id="btn-start"
+                            class="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center hover:border-red-600 transition-all bg-zinc-950 group relative">
+                            <div
+                                class="absolute inset-0 rounded-full group-hover:blur-md group-hover:bg-red-600/20 transition">
+                            </div>
+                            <i
+                                class="fa-solid fa-power-off text-2xl text-zinc-700 group-hover:text-red-600 relative z-10"></i>
+                        </button>
+                    </div>
+                    <button onclick="abrirModal()" class="btn-adquirir shadow-2xl">Reservar</button>
+                </div>
+            </div>
+
+            <div class="wrapper-360 flex flex-col items-center justify-center" id="sensor-giro">
+                <div class="floor-glow"></div>
+                <div class="absolute top-0 right-0 telemetry-adventure">
+                    <p class="text-[9px] text-red-600 uppercase font-black tracking-widest mb-1 italic">Lean Angle</p>
+                    <span id="txt-grados" class="text-3xl font-black italic text-white">0°</span>
+                </div>
+
+                <div class="hotspot" style="top: 45%; left: 45%;">
+                    <i class="fa-solid fa-plus"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase mb-1 italic">Testastretta 11°</p>
+                        <p>111 CV de potencia pura y un par motor diseñado para entrega inmediata.</p>
+                    </div>
+                </div>
+                <div class="hotspot" style="top: 35%; left: 30%;">
+                    <i class="fa-solid fa-plus"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase mb-1 italic">Front Frame</p>
+                        <p>Chasis de aluminio inspirado en la Panigale V4. Solo 166kg en seco.</p>
+                    </div>
+                </div>
+                <div class="hotspot" style="top: 65%; left: 60%;">
+                    <i class="fa-solid fa-plus"></i>
+                    <div class="hotspot-card">
+                        <p class="font-black uppercase mb-1 italic">Quick Shift</p>
+                        <p>DQS Up/Down EVO 2 para cambios de marcha ultra rápidos sin embrague.</p>
+                    </div>
+                </div>
+
+                <img id="moto-ducati" src="<%= moto.img %>" alt="<%= moto.nombre %>">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 bg-[#050505]">
+        <div class="container mx-auto px-6">
+            <h2
+                class="text-xs font-black tracking-[0.6em] text-red-600 uppercase italic mb-16 text-center md:text-left">
+                // Multimedia Assets</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="group overflow-hidden border border-white/5">
+                    <img src="/img/detalle/Ducati-Monster-MY24-design-gallery-1920x1080-05-_1__2.webp"
+                        class="h-80 w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000">
+                </div>
+                <div class="overflow-hidden border border-red-600/30 shadow-[0_0_40px_rgba(220,38,38,0.1)]">
+                    <video class="h-80 w-full object-cover" autoplay loop muted playsinline>
+                        <source src="/img/detalle/251114_DucatiMonster_CTA_V3.mp4">
+                    </video>
+                </div>
+                <div class="group overflow-hidden border border-white/5">
+                    <img src="/img/detalle/monster-overview-banner-full-1330x600.jpg"
+                        class="h-80 w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 bg-[#050505] border-t border-white/5">
+        <div class="container mx-auto px-6">
+            <h2 class="text-5xl md:text-6xl font-black italic uppercase mb-20 tracking-tighter text-center">ANATOMÍA DE
+                LA <span class="text-red-600">EXCELENCIA</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                <div class="space-y-16">
+                    <div class="border-l-4 border-zinc-900 p-8 hover:border-red-600 transition-all bg-zinc-950/50">
+                        <h4 class="text-xl font-black italic uppercase mb-3">Brembo M4.32</h4>
+                        <p class="text-zinc-500 text-xs font-mono leading-relaxed uppercase">Frenado quirúrgico con
+                            pinzas monobloque de 4 pistones.</p>
+                    </div>
+                    <div class="border-l-4 border-zinc-900 p-8 hover:border-red-600 transition-all bg-zinc-950/50">
+                        <h4 class="text-xl font-black italic uppercase mb-3">Horquilla 43mm</h4>
+                        <p class="text-zinc-500 text-xs font-mono leading-relaxed uppercase">Suspensión invertida
+                            calibrada para agilidad en curva.</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-gradient-to-b from-zinc-900/40 to-black p-10 border border-white/5 relative flex flex-col justify-center">
+                    <p
+                        class="text-[10px] font-mono text-red-600 mb-12 uppercase text-center tracking-[0.4em] font-bold">
+                        Performance Mapping</p>
+                    <div class="space-y-10">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-3 uppercase italic font-black text-white">
+                                <span>Sport</span><span>111 CV</span>
+                            </div>
+                            <div class="h-1.5 bg-red-600 w-full shadow-[0_0_15px_rgba(220,38,38,0.5)]"></div>
+                        </div>
+                        <div>
+                            <div
+                                class="flex justify-between text-[11px] mb-3 uppercase italic font-black text-zinc-400">
+                                <span>Touring</span><span>Progressive</span>
+                            </div>
+                            <div class="h-1.5 bg-zinc-600 w-[85%]"></div>
+                        </div>
+                        <div>
+                            <div
+                                class="flex justify-between text-[11px] mb-3 uppercase italic font-black text-zinc-600">
+                                <span>Urban</span><span>75 CV</span>
+                            </div>
+                            <div class="h-1.5 bg-zinc-800 w-[60%]"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-16">
+                    <div class="border-l-4 border-zinc-900 p-8 hover:border-red-600 transition-all bg-zinc-950/50">
+                        <h4 class="text-xl font-black italic uppercase mb-3">TFT 4.3"</h4>
+                        <p class="text-zinc-500 text-xs font-mono leading-relaxed uppercase">Interfaz digital inspirada
+                            en la Panigale V4 oficial.</p>
+                    </div>
+                    <div class="border-l-4 border-zinc-900 p-8 hover:border-red-600 transition-all bg-zinc-950/50">
+                        <h4 class="text-xl font-black italic uppercase mb-3">Cornering ABS</h4>
+                        <p class="text-zinc-500 text-xs font-mono leading-relaxed uppercase">Seguridad máxima incluso en
+                            grados de inclinación límite.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#080808] border-y border-white/5">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row gap-16 items-center">
+                <div class="w-full md:w-1/3">
+                    <h3 class="text-xs font-black tracking-[0.5em] text-red-600 uppercase mb-6 italic">// Service & Care
+                    </h3>
+                    <h2 class="text-5xl font-black italic uppercase leading-none tracking-tighter">KILÓMETROS DE
+                        <br><span class="text-white">CONFIANZA.</span>
+                    </h2>
+                </div>
+                <div class="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="border-l-2 border-red-600/30 pl-8 py-4 bg-white/5 transition-colors hover:bg-white/10">
+                        <p class="text-5xl font-black italic mb-2 tracking-tighter">30,000 KM</p>
+                        <p class="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">Desmo Service Interval
+                        </p>
+                    </div>
+                    <div class="border-l-2 border-red-600/30 pl-8 py-4 bg-white/5 transition-colors hover:bg-white/10">
+                        <p class="text-5xl font-black italic mb-2 tracking-tighter">4 YEARS</p>
+                        <p class="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">Ever Red Warranty</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-40 bg-zinc-950 text-center relative overflow-hidden">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-30">
+        </div>
+        <h2 class="text-xs font-black tracking-[0.8em] text-red-600 uppercase mb-10 italic">// Final Protocol</h2>
+        <h3 class="text-6xl md:text-8xl font-black italic mb-16 uppercase leading-none tracking-tighter">¿CÓMO VAS A
+            <br> <span class="text-white underline decoration-red-600 decoration-4">DESPERTARLA?</span>
+        </h3>
+
+        <div class="flex flex-wrap justify-center gap-6 mb-16">
+            <button onclick="setModo('urban')"
+                class="px-10 py-5 border border-zinc-800 text-[11px] font-black uppercase hover:bg-white hover:text-black transition-all">Modo
+                Urban</button>
+            <button onclick="setModo('touring')"
+                class="px-10 py-5 border border-zinc-800 text-[11px] font-black uppercase hover:bg-white hover:text-black transition-all">Modo
+                Touring</button>
+            <button onclick="setModo('sport')"
+                class="px-10 py-5 border border-red-600 bg-red-600/10 text-[11px] font-black uppercase hover:bg-red-600 hover:text-white transition-all">Modo
+                Sport</button>
+        </div>
+
+        <div id="modo-mensaje" class="h-12 text-[11px] font-mono text-zinc-500 uppercase tracking-[0.4em] font-bold">
+            Ajuste de mapeo pendiente...</div>
+
+        <div class="mt-20">
+            <button onclick="abrirModal()" class="btn-adquirir px-24 py-7 text-lg">Reservar Unidad Ahora</button>
+        </div>
+    </section>
+
+    <footer class="bg-black py-24 border-t border-white/5 text-center">
+        <img src="/img/logo/logo.png" class="h-5 mx-auto mb-8 opacity-40">
+        <p class="text-[9px] text-zinc-700 font-mono tracking-[0.6em] uppercase mb-4 italic">Bologna, Italy | Official
+            Ducati Network</p>
+        <p class="text-[8px] text-zinc-800 font-mono tracking-[0.5em] uppercase">44.5165° N, 11.2678° E</p>
+    </footer>
+
+    <script>
+        const sensor = document.getElementById('sensor-giro');
+        const motoImg = document.getElementById('moto-ducati');
+        const btnStart = document.getElementById('btn-start');
+        const audio = document.getElementById('audio-ducati');
+        const modal = document.getElementById('modalCompra');
+        const txtGrados = document.getElementById('txt-grados');
+
+        function abrirModal() {
+            const haySesion = "<%= session ? 'true' : 'false' %>" === "true";
+            if (!haySesion) {
+                Swal.fire({
+                    title: '<span style="font-family: \'Inter\'; font-weight: 900;">ACCESO RESTRINGIDO</span>',
+                    html: `<div style="text-align: center;"><p style="font-family: 'JetBrains Mono'; font-size: 11px; color: #dc2626; margin-bottom: 15px;">// AUTH_REQUIRED_FOR_TRANSACTION</p><p style="font-family: 'Inter'; font-size: 14px; color: #ccc;">Debes iniciar sesión en la red oficial Ducati para reservar la <strong><%= moto.nombre %></strong>.</p></div>`,
+                    background: '#050505',
+                    color: '#fff',
+                    showCancelButton: true,
+                    confirmButtonText: 'INICIAR SESIÓN',
+                    cancelButtonText: 'CANCELAR',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#1a1a1a',
+                    borderRadius: '0'
+                }).then((result) => { if (result.isConfirmed) window.location.href = '/login'; });
+            } else {
+                document.getElementById('modalCompra').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function cerrarModal() { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        function handleRotation(clientX) {
+            const rect = sensor.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const rotation = ((x / rect.width) - 0.5) * 60;
+            motoImg.style.transform = `rotateY(${rotation}deg)`;
+            motoImg.style.setProperty('--rot', `${rotation}deg`);
+            txtGrados.innerText = `${Math.round(rotation)}°`;
+            document.querySelectorAll('.hotspot').forEach(h => {
+                h.style.transform = `translateX(${rotation * -0.4}px) scale(1)`;
+            });
+        }
+
+        sensor.addEventListener('mousemove', (e) => handleRotation(e.clientX));
+        sensor.addEventListener('touchmove', (e) => {
+            
+            if (e.target.closest('.hotspot')) return;
+            handleRotation(e.touches[0].clientX);
+        }, { passive: true });
+
+        const resetRotation = () => {
+            motoImg.style.transform = 'rotateY(0deg)';
+            txtGrados.innerText = '0°';
+            document.querySelectorAll('.hotspot').forEach(h => h.style.transform = `translateX(0) scale(1)`);
+        };
+        sensor.addEventListener('mouseleave', resetRotation);
+        sensor.addEventListener('touchend', (e) => {
+            
+            if (!e.target.closest('.hotspot')) resetRotation();
+        });
+
+        
+        document.querySelectorAll('.hotspot').forEach(h => {
+            h.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasActive = h.classList.contains('active');
+                document.querySelectorAll('.hotspot').forEach(el => el.classList.remove('active'));
+                if (!wasActive) h.classList.add('active');
+            });
+        });
+
+        btnStart.addEventListener('click', () => {
+            const isOn = document.body.classList.toggle('engine-on');
+            if (isOn) {
+                audio?.play().catch(() => { });
+                motoImg.classList.add('vibrando');
+                btnStart.querySelector('i').className = 'fa-solid fa-stop text-2xl text-red-600';
+            } else {
+                audio?.pause();
+                motoImg.classList.remove('vibrando');
+                btnStart.querySelector('i').className = 'fa-solid fa-power-off text-2xl text-zinc-700';
+            }
+        });
+
+        function setModo(m) {
+            const msg = document.getElementById('modo-mensaje');
+            if (m === 'sport') msg.innerHTML = "<span class='text-red-600 animate-pulse'>SPORT: Máxima respuesta del Testastretta.</span>";
+            else if (m === 'touring') msg.innerHTML = "TOURING: Calibración balanceada para trayectos largos.";
+            else msg.innerHTML = "URBAN: Mapeo de seguridad y entrega suave.";
+        }
+    </script>
+</body>
+
+</html>

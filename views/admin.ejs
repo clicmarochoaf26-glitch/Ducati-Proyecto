@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducati Admin | Centro de Mando</title>
+    <link rel="icon" type="image/png" href="/img/logo/logo.png">
+    <link rel="apple-touch-icon" href="/img/logo/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;900&family=Space+Mono&display=swap');
+
+        body {
+            font-family: 'Lexend Deca', sans-serif;
+            background-color: #000;
+            color: white;
+            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .ducati-shadow {
+            box-shadow: 0 0 25px rgba(225, 29, 72, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Responsive Table Fix */
+        @media (max-width: 768px) {
+            .responsive-table thead {
+                display: none;
+            }
+
+            .responsive-table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #27272a;
+                background: #0a0a0a;
+            }
+
+            .responsive-table td {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border: none;
+            }
+
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 900;
+                color: #e11d48;
+                font-size: 8px;
+                text-transform: uppercase;
+            }
+
+            .sidebar-mobile {
+                position: fixed;
+                inset: 0;
+                top: 64px;
+                z-index: 90;
+                display: none;
+                background: black;
+            }
+
+            .sidebar-mobile.active {
+                display: flex;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e11d48;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInDown 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <header
+        class="md:hidden bg-black border-b border-zinc-900 p-5 sticky top-0 z-[100] flex justify-between items-center">
+        <h2 class="text-red-600 font-black italic uppercase text-xl tracking-tighter">D<span class="text-white">C</span>
+            Admin</h2>
+        <button onclick="toggleMenu()" class="text-white text-xl"><i class="fa-solid fa-bars-staggered"
+                id="menuIcon"></i></button>
+    </header>
+
+    <aside id="sidebarNav"
+        class="sidebar-mobile md:flex w-full md:w-64 bg-black border-r border-zinc-900 flex-col shrink-0 md:sticky top-0 md:h-screen">
+        <div class="p-8 hidden md:block">
+            <h2 class="text-red-600 font-black italic uppercase text-2xl tracking-tighter">D<span
+                    class="text-white">C</span> Admin</h2>
+            <p class="text-[8px] text-zinc-500 tracking-[0.3em] uppercase mt-2 font-bold">Borgo Panigale System</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="#seccion-motos" onclick="toggleMenu()"
+                class="flex items-center gap-3 p-4 text-[10px] font-black uppercase hover:text-red-600 transition group bg-zinc-900/20">
+                <i class="fa-solid fa-motorcycle text-xs"></i> Flota de Modelos
+            </a>
+            <a href="#seccion-ventas" onclick="toggleMenu()"
+                class="flex items-center gap-3 p-4 text-[10px] font-black uppercase hover:text-red-600 transition group">
+                <i class="fa-solid fa-microchip text-xs"></i> Telemetría de Ventas
+            </a>
+            <a href="#seccion-usuarios" onclick="toggleMenu()"
+                class="flex items-center gap-3 p-4 text-[10px] font-black uppercase hover:text-red-600 transition group">
+                <i class="fa-solid fa-user-shield text-xs"></i> Registro de Pilotos
+            </a>
+            <div class="pt-10 border-t border-zinc-900 mt-10">
+                <a href="/"
+                    class="flex items-center gap-3 p-4 text-[10px] font-black uppercase text-zinc-500 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i> Salir al Hangar
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-10 w-full overflow-x-hidden">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="ducati-shadow p-6 relative overflow-hidden">
+                <p class="text-[9px] text-red-600 uppercase font-black tracking-[0.2em] mb-2 italic">// Total Revenue
+                </p>
+                <h3 class="text-3xl font-black italic tracking-tighter">
+                    <% let totalReal=0; if (ventas && ventas.length> 0) {
+                        ventas.forEach(v => {
+                        let valor = v.monto || (v.moto ? v.moto.precio : 0) || 0;
+                        if (typeof valor === 'string') valor = valor.replace(/[^0-9.,]/g, "").replace(",", ".");
+                        totalReal += parseFloat(valor) || 0;
+                        });
+                        } %>
+                        €<%= totalReal.toLocaleString('de-DE', { minimumFractionDigits: 0 }) %>
+                </h3>
+            </div>
+            <div class="ducati-shadow p-6 relative overflow-hidden">
+                <p class="text-[9px] text-zinc-500 uppercase font-black tracking-[0.2em] mb-2 italic">// Active Fleet
+                </p>
+                <h3 class="text-3xl font-black italic tracking-tighter text-red-600">
+                    <%= motos.length %> <span class="text-zinc-800 text-lg">/ 5</span>
+                </h3>
+            </div>
+            <div class="ducati-shadow p-6 relative overflow-hidden">
+                <p class="text-[9px] text-zinc-500 uppercase font-black tracking-[0.2em] mb-2 italic">// Registered
+                    Pilots</p>
+                <h3 class="text-3xl font-black italic tracking-tighter">
+                    <%= usuarios.length %>
+                </h3>
+            </div>
+        </div>
+
+        <section id="seccion-motos" class="mb-16">
+            <h2
+                class="text-white font-black uppercase italic text-2xl tracking-tighter mb-8 border-l-4 border-red-600 pl-4">
+                Gestión de Flota</h2>
+            <div class="grid gap-4">
+                <% motos.forEach(m=> { %>
+                    <div class="ducati-shadow p-4 flex flex-col sm:flex-row justify-between items-center group gap-4">
+                        <div class="flex items-center gap-6 w-full sm:w-auto">
+                            <div class="h-14 w-24 bg-black border border-zinc-800 p-2 flex items-center justify-center">
+                                <img src="<%= m.img %>"
+                                    class="max-h-full object-contain grayscale group-hover:grayscale-0 transition duration-500">
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black uppercase italic">
+                                    <%= m.nombre %>
+                                </h3>
+                                <p class="text-[9px] font-mono text-zinc-600 uppercase">SYS_ID: <%=
+                                        m._id.toString().slice(-6).toUpperCase() %>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between w-full sm:w-auto gap-8">
+                            <span class="text-xl font-black italic tracking-tighter">€<%=
+                                    Number(m.precio.toString().replace(/[€$.]/g, "" )).toLocaleString('de-DE') %></span>
+                            <div class="flex gap-2">
+                                <button onclick="editarPrecio('<%= m._id %>', '<%= m.nombre %>')"
+                                    class="h-10 w-10 flex items-center justify-center border border-zinc-800 hover:bg-white hover:text-black transition"><i
+                                        class="fa-solid fa-pen-to-square text-xs"></i></button>
+                                <button onclick="eliminarMoto('<%= m._id %>', '<%= m.nombre %>')"
+                                    class="h-10 w-10 flex items-center justify-center border border-zinc-800 hover:bg-red-600 transition"><i
+                                        class="fa-solid fa-trash-can text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </section>
+
+        <section id="seccion-ventas" class="mb-16">
+            <h2
+                class="text-white font-black uppercase italic text-2xl tracking-tighter mb-8 border-l-4 border-red-600 pl-4">
+                Data Log: Ventas</h2>
+            <div class="ducati-shadow overflow-hidden">
+                <table class="w-full text-[10px] uppercase font-bold responsive-table">
+                    <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-900">
+                        <tr>
+                            <th class="p-5 text-left italic">Transacción</th>
+                            <th class="p-5 text-left italic">Modelo / Activo</th>
+                            <th class="p-5 text-left italic">Piloto / Cliente</th>
+                            <th class="p-5 text-right italic text-red-600">Estado del Sistema</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-900 font-mono">
+                        <% if (ventas && ventas.length> 0) { %>
+                            <% ventas.forEach(v=> { %>
+                                <tr class="hover:bg-red-600/5 transition">
+                                    <td class="p-5 text-white" data-label="ID">#<%= v.transaccionId %>
+                                    </td>
+                                    <td class="p-5 text-zinc-300" data-label="MOTO">
+                                        <%= v.moto.nombre %>
+                                    </td>
+                                    <td class="p-5 text-zinc-500" data-label="PILOTO">
+                                        <%= v.cliente.nombre %>
+                                    </td>
+                                    <td class="p-5 text-right" data-label="ESTADO">
+                                        <select onchange="actualizarEstatus('<%= v._id %>', this.value)"
+                                            class="bg-black border border-zinc-800 text-[9px] font-black uppercase italic p-2 outline-none w-full sm:w-auto">
+                                            <option value="Pago Verificado" <%=v.estado==='Pago Verificado' ? 'selected'
+                                                : '' %>>Pago Verificado</option>
+                                            <option value="Enviada" <%=v.estado==='Enviada' ? 'selected' : '' %>>Enviada
+                                            </option>
+                                            <option value="Entregada" <%=v.estado==='Entregada' ? 'selected' : '' %>
+                                                >Entregada</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="seccion-usuarios" class="mb-20">
+            <h2
+                class="text-white font-black uppercase italic text-2xl tracking-tighter mb-8 border-l-4 border-red-600 pl-4">
+                Base de Datos: Pilotos</h2>
+            <div class="mb-6">
+                <input type="text" id="userSearch" onkeyup="filtrarUsuarios()"
+                    placeholder="BUSCAR POR NOMBRE, EMAIL O UID..."
+                    class="w-full bg-zinc-900/30 border border-zinc-800 text-white text-[10px] font-black p-4 focus:border-red-600 outline-none uppercase italic">
+            </div>
+
+            <div class="grid grid-cols-1 gap-4" id="contenedor-pilotos">
+                <% usuarios.forEach(u=> { %>
+                    <div class="flex flex-col user-card-container">
+                        <div onclick="toggleUserDetalles('<%= u._id %>')"
+                            class="ducati-shadow p-5 flex items-center justify-between cursor-pointer bg-zinc-950">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 bg-zinc-900 flex items-center justify-center border border-zinc-800">
+                                    <i class="fa-solid fa-user text-xs"></i></div>
+                                <div>
+                                    <p class="text-[11px] font-black uppercase italic text-white">
+                                        <%= u.username %>
+                                    </p>
+                                    <p class="text-[8px] font-mono uppercase text-zinc-600">ROL: <%= u.role %> | PAÍS:
+                                            <%= u.pais || 'N/A' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-zinc-800" id="icon-<%= u._id %>"></i>
+                        </div>
+
+                        <div id="user-info-<%= u._id %>"
+                            class="hidden bg-zinc-900/10 border-x border-b border-zinc-900/50 p-8 animate-fade-in">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                                <div class="space-y-4">
+                                    <p class="text-[9px] text-red-600 uppercase font-black italic tracking-widest">//
+                                        Perfil del Piloto</p>
+                                    <div class="space-y-3 text-[10px] uppercase">
+                                        <div class="flex flex-col border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600 text-[8px] font-bold">Nombre Completo:</span>
+                                            <span class="text-white font-black italic">
+                                                <%= u.nombre %>
+                                                    <%= u.apellido %>
+                                            </span>
+                                        </div>
+                                        <div class="flex flex-col border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600 text-[8px] font-bold">Email:</span>
+                                            <span class="text-white">
+                                                <%= u.correo || u.email %>
+                                            </span>
+                                        </div>
+                                        <div class="flex flex-col border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600 text-[8px] font-bold">Teléfono:</span>
+                                            <span class="text-white">
+                                                <%= u.celular || 'S/N' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <p class="text-[9px] text-zinc-500 uppercase font-black italic tracking-widest">//
+                                        Logs de Sistema</p>
+                                    <div class="space-y-3 text-[10px] uppercase">
+                                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600">UID:</span>
+                                            <span class="text-zinc-400 font-mono">
+                                                <%= u._id.toString().slice(-10).toUpperCase() %>
+                                            </span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600">Verificado:</span>
+                                            <span
+                                                class="<%= u.verificado ? 'text-green-500' : 'text-yellow-500' %> font-black">
+                                                <%= u.verificado ? 'SI' : 'NO' %>
+                                            </span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                                            <span class="text-zinc-600">Preferencia:</span>
+                                            <span class="text-red-600 font-black italic">
+                                                <%= u.moto_preferida || 'NINGUNA' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <p class="text-[9px] text-red-600 uppercase font-black italic tracking-widest">//
+                                        Garaje de Activos</p>
+                                    <div class="space-y-2">
+                                        <% const misMotos=ventas.filter(v=> v.cliente && v.cliente.id &&
+                                            v.cliente.id.toString() === u._id.toString()); %>
+                                            <% if (misMotos.length> 0) { %>
+                                                <% misMotos.forEach(compra=> { %>
+                                                    <div
+                                                        class="flex items-center justify-between bg-black/40 p-3 border border-zinc-900">
+                                                        <span
+                                                            class="text-[10px] font-black uppercase italic text-white">
+                                                            <%= compra.moto.nombre %>
+                                                        </span>
+                                                        <span
+                                                            class="text-[7px] font-bold text-zinc-500 uppercase italic">
+                                                            <%= compra.estado %>
+                                                        </span>
+                                                    </div>
+                                                    <% }) %>
+                                                        <% } else { %>
+                                                            <div
+                                                                class="border border-dashed border-zinc-900 p-4 text-center">
+                                                                <p
+                                                                    class="text-[8px] text-zinc-700 italic uppercase font-black">
+                                                                    Sin adquisiciones</p>
+                                                            </div>
+                                                            <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            if (window.innerWidth < 768) {
+                const nav = document.getElementById('sidebarNav');
+                const icon = document.getElementById('menuIcon');
+                nav.classList.toggle('active');
+                icon.classList.toggle('fa-bars-staggered');
+                icon.classList.toggle('fa-xmark');
+            }
+        }
+
+        function toggleUserDetalles(id) {
+            const panel = document.getElementById(`user-info-${id}`);
+            const icono = document.getElementById(`icon-${id}`);
+            panel.classList.toggle('hidden');
+            icono.style.transform = panel.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function filtrarUsuarios() {
+            const filter = document.getElementById('userSearch').value.toUpperCase();
+            const cards = document.getElementsByClassName('user-card-container');
+            for (let i = 0; i < cards.length; i++) {
+                const content = cards[i].innerText.toUpperCase();
+                cards[i].style.display = content.indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+
+        async function actualizarEstatus(id, estado) {
+            await fetch(`/admin/ventas/estado/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nuevoEstado: estado }) });
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'LOG SYNC', showConfirmButton: false, timer: 1000, background: '#000', color: '#fff' });
+        }
+
+        async function editarPrecio(id, nombre) {
+            const { value } = await Swal.fire({ title: 'AJUSTE', text: nombre, input: 'number', background: '#000', color: '#fff' });
+            if (value) { await fetch(`/admin/motos/update-price/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nuevoPrecio: value }) }); location.reload(); }
+        }
+
+        async function eliminarMoto(id, nombre) {
+            if ((await Swal.fire({ title: 'BORRAR?', text: nombre, icon: 'warning', background: '#000', color: '#fff' })).isConfirmed) { await fetch(`/admin/motos/delete/${id}`, { method: 'POST' }); location.reload(); }
+        }
+    </script>
+</body>
+
+</html>
