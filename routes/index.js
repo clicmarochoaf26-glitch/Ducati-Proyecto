@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Moto = require('../models/Moto');
+const Moto = require('../models/moto');
 const User = require('../models/user');
 const Venta = require('../models/venta');
 const nodemailer = require('nodemailer');
