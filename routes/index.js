@@ -6,16 +6,17 @@ const Venta = require('../models/venta');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, 
     auth: {
         user: 'clicmarochoaf.26@gmail.com',
         pass: 'prbp hhqt dnbo zicx'
-    },
+    }, 
     tls: {
         rejectUnauthorized: false
     }
 });
-
 
 router.get('/', async (req, res) => {
     try {
@@ -186,14 +187,14 @@ router.post('/login', async (req, res) => {
         if (user && user.password === password.trim()) {
             if (user.role !== 'admin' && !user.verificado) return res.status(401).send("Verifica tu cuenta.");
 
-            
+
             req.session.user = { id: user._id, username: user.username, nombre: user.nombre, role: user.role || 'client' };
 
-            
+
             if (user.role === 'admin') {
-                return res.redirect('/admin'); 
+                return res.redirect('/admin');
             } else {
-                return res.redirect('/'); 
+                return res.redirect('/');
             }
         }
         return res.redirect('/login?error=true');
@@ -208,7 +209,7 @@ router.get('/logout', (req, res) => {
 router.get('/perfil', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
 
-    
+
     if (req.session.user.role === 'admin') {
         return res.redirect('/admin');
     }
