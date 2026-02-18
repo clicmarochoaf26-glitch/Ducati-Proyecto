@@ -4,7 +4,7 @@ const Moto = require('../models/moto');
 const User = require('../models/user');
 const Venta = require('../models/venta');
 
-// --- CAMBIO DE NODEMAILER A RESEND ---
+// --- CONFIGURACIÓN DE RESEND ---
 const { Resend } = require('resend');
 const resend = new Resend('re_CU8hKkmK_BRm6jrkfQGVWcFrhJzu8pGcv');
 
@@ -24,6 +24,7 @@ router.get('/moto/:id', async (req, res) => {
     try {
         const moto = await Moto.findById(req.params.id);
         if (!moto) return res.status(404).send("Esta Ducati no existe.");
+
         const nombreMoto = moto.nombre.toUpperCase().trim();
         const renderData = { moto, session: req.session.user || null };
 
@@ -106,7 +107,7 @@ router.post('/registro', async (req, res) => {
         else if (/tokyo|japan|japón|tokio|ja/.test(inputIdioma)) claveIdioma = 'ja';
         else if (/miami|usa|eeuu|english|ingles|en/.test(inputIdioma)) claveIdioma = 'en';
         else if (/roma|italia|italy|it/.test(inputIdioma)) claveIdioma = 'it';
-        else if (/berlin|alemania|germany|deutsch|de/.test(inputIdioma)) claveIdioma = 'de'; // <--- Línea añadida
+        else if (/berlin|alemania|germany|deutsch|de/.test(inputIdioma)) claveIdioma = 'de';
 
         const textos = {
             es: { sub: `CÓDIGO: ${codigoVerificacion}`, t: "DUCATI MADRID / CARACAS", s: `Hola ${nombre.toUpperCase()}` },
@@ -114,8 +115,9 @@ router.post('/registro', async (req, res) => {
             en: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI MIAMI", s: `Welcome ${nombre.toUpperCase()}` },
             ja: { sub: `コード: ${codigoVerificacion}`, t: "DUCATI TOKYO NISHI", s: `こんにちは ${nombre.toUpperCase()}` },
             ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` },
-            de: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI BERLIN", s: `Hallo ${nombre.toUpperCase()}` } // <--- Línea añadida
+            de: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI BERLIN", s: `Hallo ${nombre.toUpperCase()}` }
         };
+
         const t = textos[claveIdioma] || textos.es;
 
         const nuevoUsuario = new User({
@@ -125,7 +127,6 @@ router.post('/registro', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        // --- ENVÍO CON RESEND ---
         try {
             await resend.emails.send({
                 from: 'Ducati Squadra Corse <onboarding@resend.dev>',
@@ -136,15 +137,38 @@ router.post('/registro', async (req, res) => {
                         <p>${t.s}, tu código es: <b>${codigoVerificacion}</b></p>
                       </div>`
             });
-            console.log("Correo enviado con Resend.");
-        } catch (mailError) {
-            console.error("Error enviando correo:", mailError);
-        }
+        } catch (mailError) { console.error(mailError); }
 
         res.render('verificar-codigo', { correo });
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error crítico en el sistema.");
+        res.status(500).send("Error crítico.");
+    }
+});
+
+// --- RUTA PARA REENVIAR CÓDIGO (ESTA ES LA QUE TE FALTABA) ---
+router.post('/reenviar-codigo', async (req, res) => {
+    try {
+        const { correo } = req.body;
+        const usuario = await User.findOne({ correo: correo.toLowerCase() });
+
+        if (usuario) {
+            await resend.emails.send({
+                from: 'Ducati Squadra Corse <onboarding@resend.dev>',
+                to: usuario.correo,
+                subject: `REENVÍO: Código ${usuario.codigoTemp}`,
+                html: `<div style="background:#000; color:#fff; padding:40px; text-align:center; font-family:sans-serif; border: 2px solid #ce1d19;">
+                        <h1 style="color:#ce1d19;">DUCATI SYSTEM</h1>
+                        <p>Hola de nuevo, ${usuario.nombre.toUpperCase()}.</p>
+                        <p>Tu código de verificación es: <b>${usuario.codigoTemp}</b></p>
+                      </div>`
+            });
+            res.render('verificar-codigo', { correo: usuario.correo, msg: 'Código reenviado' });
+        } else {
+            res.status(404).send("Usuario no encontrado.");
+        }
+    } catch (error) {
+        res.status(500).send("Error al reenviar.");
     }
 });
 
@@ -174,15 +198,10 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({
             $or: [{ username: username.trim() }, { correo: username.trim().toLowerCase() }]
         });
-
         if (user && user.password === password.trim()) {
             if (user.role !== 'admin' && !user.verificado) return res.status(401).send("Verifica tu cuenta.");
             req.session.user = { id: user._id, username: user.username, nombre: user.nombre, role: user.role || 'client' };
-            if (user.role === 'admin') {
-                return res.redirect('/admin');
-            } else {
-                return res.redirect('/');
-            }
+            return user.role === 'admin' ? res.redirect('/admin') : res.redirect('/');
         }
         return res.redirect('/login?error=true');
     } catch (err) { res.status(500).send("Error."); }
@@ -194,20 +213,12 @@ router.get('/logout', (req, res) => {
 
 router.get('/perfil', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
-    if (req.session.user.role === 'admin') {
-        return res.redirect('/admin');
-    }
+    if (req.session.user.role === 'admin') return res.redirect('/admin');
     try {
         const usuario = await User.findById(req.session.user.id);
         const misCompras = await Venta.find({ "cliente.id": req.session.user.id });
         const motoProxima = await Moto.findOne({ nombre: { $regex: new RegExp(usuario.moto_preferida, "i") } });
-
-        res.render('perfil', {
-            user: usuario,
-            compras: misCompras,
-            proxima: motoProxima,
-            session: req.session.user
-        });
+        res.render('perfil', { user: usuario, compras: misCompras, proxima: motoProxima, session: req.session.user });
     } catch (error) { res.status(500).send("Error."); }
 });
 
@@ -216,7 +227,6 @@ router.post('/comprar/:id', async (req, res) => {
     try {
         const motoDB = await Moto.findById(req.params.id);
         const usuarioDB = await User.findById(req.session.user.id);
-
         const nuevaVenta = new Venta({
             transaccionId: 'DUC-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
             cliente: { id: usuarioDB._id, nombre: usuarioDB.nombre, email: usuarioDB.correo, pais: usuarioDB.pais },
@@ -225,7 +235,6 @@ router.post('/comprar/:id', async (req, res) => {
             fecha: new Date(),
             estado: 'Pago Verificado'
         });
-
         await nuevaVenta.save();
         res.redirect('/perfil#mis-compras');
     } catch (error) { res.status(500).send("Error."); }
