@@ -3,20 +3,10 @@ const router = express.Router();
 const Moto = require('../models/moto');
 const User = require('../models/user');
 const Venta = require('../models/venta');
-const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,         
-    secure: false,      
-    auth: {
-        user: 'clicmarochoaf.26@gmail.com',
-        pass: 'prbp hhqt dnbo zicx'
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+// --- CAMBIO DE NODEMAILER A RESEND ---
+const { Resend } = require('resend');
+const resend = new Resend('re_CU8hKkmK_BRm6jrkfQGVWcFrhJzu8pGcv');
 
 router.get('/', async (req, res) => {
     try {
@@ -30,12 +20,10 @@ router.get('/', async (req, res) => {
     }
 });
 
-
 router.get('/moto/:id', async (req, res) => {
     try {
         const moto = await Moto.findById(req.params.id);
         if (!moto) return res.status(404).send("Esta Ducati no existe.");
-
         const nombreMoto = moto.nombre.toUpperCase().trim();
         const renderData = { moto, session: req.session.user || null };
 
@@ -48,7 +36,6 @@ router.get('/moto/:id', async (req, res) => {
         res.status(500).send("Error en la telemetría.");
     }
 });
-
 
 router.get('/admin', async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'admin') {
@@ -71,7 +58,6 @@ router.get('/admin', async (req, res) => {
     }
 });
 
-
 router.post('/admin/ventas/estado/:id', async (req, res) => {
     try {
         await Venta.findByIdAndUpdate(req.params.id, { estado: req.body.nuevoEstado });
@@ -92,7 +78,6 @@ router.post('/admin/motos/delete/:id', async (req, res) => {
         res.sendStatus(200);
     } catch (err) { res.status(500).send(err); }
 });
-
 
 router.get('/registro', async (req, res) => {
     if (req.session.user) return res.redirect('/');
@@ -121,15 +106,16 @@ router.post('/registro', async (req, res) => {
         else if (/tokyo|japan|japón|tokio|ja/.test(inputIdioma)) claveIdioma = 'ja';
         else if (/miami|usa|eeuu|english|ingles|en/.test(inputIdioma)) claveIdioma = 'en';
         else if (/roma|italia|italy|it/.test(inputIdioma)) claveIdioma = 'it';
+        else if (/berlin|alemania|germany|deutsch|de/.test(inputIdioma)) claveIdioma = 'de'; // <--- Línea añadida
 
         const textos = {
             es: { sub: `CÓDIGO: ${codigoVerificacion}`, t: "DUCATI MADRID / CARACAS", s: `Hola ${nombre.toUpperCase()}` },
             it: { sub: `CODICE: ${codigoVerificacion}`, t: "DUCATI ROMA", s: `Ciao ${nombre.toUpperCase()}` },
             en: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI MIAMI", s: `Welcome ${nombre.toUpperCase()}` },
             ja: { sub: `コード: ${codigoVerificacion}`, t: "DUCATI TOKYO NISHI", s: `こんにちは ${nombre.toUpperCase()}` },
-            ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` }
+            ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` },
+            de: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI BERLIN", s: `Hallo ${nombre.toUpperCase()}` } // <--- Línea añadida
         };
-
         const t = textos[claveIdioma] || textos.es;
 
         const nuevoUsuario = new User({
@@ -139,15 +125,21 @@ router.post('/registro', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        await transporter.sendMail({
-            from: '"Ducati Squadra Corse" <clicmarochoaf.26@gmail.com>',
-            to: correo,
-            subject: t.sub,
-            html: `<div style="background:#000; color:#fff; padding:40px; text-align:center; font-family:sans-serif;">
-                    <h1 style="color:#ce1d19;">${t.t}</h1>
-                    <p>${t.s}, tu código es: <b>${codigoVerificacion}</b></p>
-                  </div>`
-        });
+        // --- ENVÍO CON RESEND ---
+        try {
+            await resend.emails.send({
+                from: 'Ducati Squadra Corse <onboarding@resend.dev>',
+                to: correo.toLowerCase(),
+                subject: t.sub,
+                html: `<div style="background:#000; color:#fff; padding:40px; text-align:center; font-family:sans-serif; border: 2px solid #ce1d19;">
+                        <h1 style="color:#ce1d19;">${t.t}</h1>
+                        <p>${t.s}, tu código es: <b>${codigoVerificacion}</b></p>
+                      </div>`
+            });
+            console.log("Correo enviado con Resend.");
+        } catch (mailError) {
+            console.error("Error enviando correo:", mailError);
+        }
 
         res.render('verificar-codigo', { correo });
     } catch (err) {
@@ -169,7 +161,6 @@ router.post('/verificar-codigo', async (req, res) => {
     } catch (error) { res.status(500).send("Error."); }
 });
 
-
 router.get('/login', (req, res) => {
     if (req.session.user) {
         return req.session.user.role === 'admin' ? res.redirect('/admin') : res.redirect('/');
@@ -186,11 +177,7 @@ router.post('/login', async (req, res) => {
 
         if (user && user.password === password.trim()) {
             if (user.role !== 'admin' && !user.verificado) return res.status(401).send("Verifica tu cuenta.");
-
-
             req.session.user = { id: user._id, username: user.username, nombre: user.nombre, role: user.role || 'client' };
-
-
             if (user.role === 'admin') {
                 return res.redirect('/admin');
             } else {
@@ -205,15 +192,11 @@ router.get('/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/login?logout=true'));
 });
 
-
 router.get('/perfil', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
-
-
     if (req.session.user.role === 'admin') {
         return res.redirect('/admin');
     }
-
     try {
         const usuario = await User.findById(req.session.user.id);
         const misCompras = await Venta.find({ "cliente.id": req.session.user.id });
