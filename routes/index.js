@@ -7,8 +7,8 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,         
-    secure: false,      
+    port: 465,
+    secure: true,
     auth: {
         user: 'clicmarochoaf.26@gmail.com',
         pass: 'prbp hhqt dnbo zicx'
@@ -121,13 +121,15 @@ router.post('/registro', async (req, res) => {
         else if (/tokyo|japan|japón|tokio|ja/.test(inputIdioma)) claveIdioma = 'ja';
         else if (/miami|usa|eeuu|english|ingles|en/.test(inputIdioma)) claveIdioma = 'en';
         else if (/roma|italia|italy|it/.test(inputIdioma)) claveIdioma = 'it';
+        else if (/berlin|alemania|germany|deutsch|de/.test(inputIdioma)) claveIdioma = 'de';
 
         const textos = {
             es: { sub: `CÓDIGO: ${codigoVerificacion}`, t: "DUCATI MADRID / CARACAS", s: `Hola ${nombre.toUpperCase()}` },
             it: { sub: `CODICE: ${codigoVerificacion}`, t: "DUCATI ROMA", s: `Ciao ${nombre.toUpperCase()}` },
             en: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI MIAMI", s: `Welcome ${nombre.toUpperCase()}` },
             ja: { sub: `コード: ${codigoVerificacion}`, t: "DUCATI TOKYO NISHI", s: `こんにちは ${nombre.toUpperCase()}` },
-            ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` }
+            ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` },
+            de: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI BERLIN", s: `Hallo ${nombre.toUpperCase()}` }
         };
 
         const t = textos[claveIdioma] || textos.es;
@@ -167,6 +169,51 @@ router.post('/verificar-codigo', async (req, res) => {
             res.redirect(`/login?success=true`);
         } else res.send("Código incorrecto.");
     } catch (error) { res.status(500).send("Error."); }
+});
+
+router.post('/reenviar-codigo', async (req, res) => {
+    try {
+        const { correo } = req.body;
+        // Buscamos al piloto por su correo
+        const usuario = await User.findOne({ correo: correo.toLowerCase() });
+
+        if (!usuario) {
+            return res.status(404).send("Piloto no encontrado.");
+        }
+
+        // Preparamos el mensaje de telemetría
+        const mailOptions = {
+            from: '"Ducati Squadra Corse" <clicmarochoaf.26@gmail.com>',
+            to: usuario.correo,
+            subject: `REENVÍO DE CÓDIGO: ${usuario.codigoTemp}`,
+            html: `
+                <div style="background:#000; color:#fff; padding:30px; border:2px solid #ce1d19; text-align:center; font-family:Arial;">
+                    <h1 style="color:#ce1d19;">DUCATI SYSTEM</h1>
+                    <p>Has solicitado un reenvío. Tu código de acceso es:</p>
+                    <h2 style="letter-spacing:5px; background:#1a1a1a; padding:10px;">${usuario.codigoTemp}</h2>
+                </div>`
+        };
+
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("❌ Error en reenvío:", error);
+            } else {
+                console.log("📧 Reenvío exitoso a: " + usuario.correo);
+            }
+        });
+
+
+        res.render('verificar-codigo', {
+            correo: usuario.correo,
+            error_codigo: null,
+            msg: 'CÓDIGO REENVIADO CON ÉXITO'
+        });
+
+    } catch (error) {
+        console.error("Error en la ruta de reenvío:", error);
+        res.status(500).send("Error interno en el servidor.");
+    }
 });
 
 
