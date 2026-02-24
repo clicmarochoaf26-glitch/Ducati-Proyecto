@@ -94,29 +94,36 @@ router.post('/admin/motos/delete/:id', async (req, res) => {
 });
 
 
-router.get('/registro', async (req, res) => {
-    if (req.session.user) return res.redirect('/');
-    try {
-        const motosDB = await Moto.find().limit(5);
-        res.render('registro', { motos: motosDB });
-    } catch (error) {
-        res.status(500).send("Error al cargar el hangar.");
-    }
-});
+
 
 router.post('/registro', async (req, res) => {
     try {
         const { nombre, apellido, celular, correo, password, pais, moto_preferida, username, idioma } = req.body;
+
+
+        const motosDB = await Moto.find().limit(5);
+
         const regexClave = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
-        if (!regexClave.test(password)) return res.status(400).send("La contraseña no cumple requisitos.");
+        if (!regexClave.test(password)) {
+            return res.render('registro', {
+                motos: motosDB,
+                error_type: 'password_weak'
+            });
+        }
+
 
         const existe = await User.findOne({ correo: correo.toLowerCase() });
-        if (existe) return res.status(400).send("Este piloto ya existe.");
+        if (existe) {
+            return res.render('registro', {
+                motos: motosDB,
+                error_type: 'user_exists'
+            });
+        }
+
 
         const codigoVerificacion = Math.floor(100000 + Math.random() * 900000).toString();
         const inputIdioma = (idioma || '').toLowerCase().trim();
         let claveIdioma = 'es';
-
         if (/dubai|uae|emiratos|arabe|arabia/.test(inputIdioma)) claveIdioma = 'ar';
         else if (/tokyo|japan|japón|tokio|ja/.test(inputIdioma)) claveIdioma = 'ja';
         else if (/miami|usa|eeuu|english|ingles|en/.test(inputIdioma)) claveIdioma = 'en';
@@ -131,8 +138,8 @@ router.post('/registro', async (req, res) => {
             ar: { sub: `${codigoVerificacion} :رمز التحقق`, t: "DUCATI DUBAI", s: `مرحباً ${nombre.toUpperCase()}` },
             de: { sub: `CODE: ${codigoVerificacion}`, t: "DUCATI BERLIN", s: `Hallo ${nombre.toUpperCase()}` }
         };
-
         const t = textos[claveIdioma] || textos.es;
+
 
         const nuevoUsuario = new User({
             nombre, apellido, celular, correo: correo.toLowerCase(),
@@ -141,20 +148,22 @@ router.post('/registro', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        await transporter.sendMail({
+        transporter.sendMail({
             from: '"Ducati Squadra Corse" <clicmarochoaf.26@gmail.com>',
             to: correo,
             subject: t.sub,
-            html: `<div style="background:#000; color:#fff; padding:40px; text-align:center; font-family:sans-serif;">
+            html: `<div style="background:#000; color:#fff; padding:40px; text-align:center; font-family:sans-serif; border: 2px solid #ce1d19;">
                     <h1 style="color:#ce1d19;">${t.t}</h1>
                     <p>${t.s}, tu código es: <b>${codigoVerificacion}</b></p>
                   </div>`
-        });
+        }).catch(e => console.log("Error de envío:", e));
 
-        res.render('verificar-codigo', { correo });
+        res.render('verificar-codigo', { correo, error_codigo: null });
+
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error crítico en el sistema.");
+        const motosDB = await Moto.find().limit(5);
+        res.render('registro', { motos: motosDB, error_type: 'critical' });
     }
 });
 
@@ -174,14 +183,14 @@ router.post('/verificar-codigo', async (req, res) => {
 router.post('/reenviar-codigo', async (req, res) => {
     try {
         const { correo } = req.body;
-        // Buscamos al piloto por su correo
+
         const usuario = await User.findOne({ correo: correo.toLowerCase() });
 
         if (!usuario) {
             return res.status(404).send("Piloto no encontrado.");
         }
 
-        // Preparamos el mensaje de telemetría
+
         const mailOptions = {
             from: '"Ducati Squadra Corse" <clicmarochoaf.26@gmail.com>',
             to: usuario.correo,

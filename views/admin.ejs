@@ -173,9 +173,18 @@
         </div>
 
         <section id="seccion-motos" class="mb-16">
-            <h2
-                class="text-white font-black uppercase italic text-2xl tracking-tighter mb-8 border-l-4 border-red-600 pl-4">
-                Gestión de Flota</h2>
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-l-4 border-red-600 pl-4 gap-4">
+                <h2 class="text-white font-black uppercase italic text-2xl tracking-tighter">
+                    Gestión de Flota
+                </h2>
+
+                <button onclick="abrirModalAgregar()"
+                    class="bg-red-600 hover:bg-white hover:text-red-600 text-white text-[10px] font-black px-6 py-2.5 transition-all duration-300 uppercase italic tracking-[0.2em] flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-xs"></i> Nueva Unidad
+                </button>
+            </div>
+
             <div class="grid gap-4">
                 <% motos.forEach(m=> { %>
                     <div class="ducati-shadow p-4 flex flex-col sm:flex-row justify-between items-center group gap-4">
@@ -273,7 +282,8 @@
                             <div class="flex items-center gap-4">
                                 <div
                                     class="w-10 h-10 bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                                    <i class="fa-solid fa-user text-xs"></i></div>
+                                    <i class="fa-solid fa-user text-xs"></i>
+                                </div>
                                 <div>
                                     <p class="text-[11px] font-black uppercase italic text-white">
                                         <%= u.username %>
@@ -419,6 +429,7 @@
         async function eliminarMoto(id, nombre) {
             if ((await Swal.fire({ title: 'BORRAR?', text: nombre, icon: 'warning', background: '#000', color: '#fff' })).isConfirmed) { await fetch(`/admin/motos/delete/${id}`, { method: 'POST' }); location.reload(); }
         }
+        
     </script>
 </body>
 

@@ -182,6 +182,7 @@
         </p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const passInput = document.getElementById('passwordInput');
         const confirmInput = document.getElementById('confirmPasswordInput');
@@ -189,6 +190,7 @@
         const paisSelect = document.getElementById('paisSelect');
         const prefijoVisor = document.getElementById('prefijoVisor');
         const idiomaInput = document.getElementById('idiomaInput');
+
 
         paisSelect.addEventListener('change', function () {
             const option = this.options[this.selectedIndex];
@@ -205,6 +207,7 @@
             eye.classList.toggle('fa-eye');
             eye.classList.toggle('fa-eye-slash');
         }
+
 
         function validarFormulario() {
             const val = passInput.value;
@@ -238,6 +241,7 @@
         passInput.addEventListener('input', validarFormulario);
         confirmInput.addEventListener('input', validarFormulario);
 
+
         document.getElementById('ducatiForm').addEventListener('submit', function (e) {
             const val = passInput.value;
             const confVal = confirmInput.value;
@@ -245,12 +249,59 @@
 
             if (!regex.test(val) || val !== confVal) {
                 e.preventDefault();
-                alert("Verifica la telemetría de tu contraseña antes de entrar a pista.");
+
+
+                Swal.fire({
+                    title: '<span style="color: #ce1d19; font-family: sans-serif; font-weight: 900;">FALLO DE TELEMETRÍA</span>',
+                    text: 'Revisa los requisitos de seguridad de tu contraseña antes de entrar a pista.',
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    confirmButtonColor: '#ce1d19',
+                    confirmButtonText: 'AJUSTAR CONFIGURACIÓN',
+                    customClass: {
+                        popup: 'border-ducati'
+                    }
+                });
             }
         });
 
+        window.addEventListener('load', function () {
+            const errorFromServer = "<%= locals.error_type || '' %>";
 
+            if (errorFromServer === 'user_exists') {
+                Swal.fire({
+                    title: '<span style="color: #ce1d19; font-family: sans-serif; font-weight: 900;">ACCESO DENEGADO</span>',
+                    text: 'Este piloto ya está registrado en la base de datos de Borgo Panigale. ¡Intenta iniciar sesión!',
+                    icon: 'warning',
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    confirmButtonColor: '#ce1d19',
+                    confirmButtonText: 'IR AL LOGIN',
+                    customClass: {
+                        popup: 'border-ducati'
+                    }
+                });
+            } else if (errorFromServer === 'critical') {
+                Swal.fire({
+                    title: '<span style="color: #ce1d19;">FALLO DE TELEMETRÍA</span>',
+                    text: 'Se ha perdido la conexión con los servidores centrales. Intenta de nuevo.',
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    confirmButtonColor: '#ce1d19',
+                    confirmButtonText: 'REINTENTAR'
+                });
+            }
+        });
     </script>
+
+    <style>
+        .border-ducati {
+            border: 2px solid #ce1d19 !important;
+            border-radius: 0px !important;
+        }
+    </style>
 </body>
 
 </html>

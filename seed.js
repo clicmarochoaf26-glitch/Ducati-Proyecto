@@ -59,13 +59,7 @@ const motos = [
         precio: "24.390 €",
         img: "/img/Streetfighter-V4.png"
     },
-    {
-        nombre: "Hypermotard 950",
-        motor: "937 cc",
-        potencia: "114 hp",
-        precio: "16.990 €",
-        img: "/img/Hypermotard-V2.png"
-    },
+
     {
         nombre: "Scrambler Icon Dark",
         motor: "803 cc",
@@ -80,13 +74,7 @@ const motos = [
         precio: "16.290 €",
         img: "/img/Desmo-450MX.png"
     },
-    {
-        nombre: "XDiavel V4",
-        motor: "1.158 cc",
-        potencia: "168 hp",
-        precio: "32.990 €",
-        img: "/img/XDiavel-V4.png"
-    }
+    
 ];
 
 
