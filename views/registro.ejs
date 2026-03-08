@@ -36,70 +36,51 @@
 
         .status-success {
             border-color: #00ff41 !important;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2) !important;
-        }
-
-        button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
     </style>
 </head>
 
-<body class="text-white min-h-screen flex items-center justify-center py-8 px-4 md:px-6">
+<body class="text-white min-h-screen flex items-center justify-center py-8 px-4">
 
-    <div class="max-w-2xl w-full bg-black/60 p-6 md:p-12 rounded-sm border border-zinc-900 shadow-2xl backdrop-blur-md">
-        <div class="text-center mb-8 md:mb-10">
-            <h1 class="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-none">DUCATI</h1>
-            <p
-                class="text-red-600 text-[9px] md:text-[10px] tracking-[0.4em] md:tracking-[0.5em] uppercase font-bold mt-2">
-                Crea tu Perfil Oficial</p>
+    <div class="max-w-2xl w-full bg-black/60 p-8 md:p-12 rounded-sm border border-zinc-900 shadow-2xl backdrop-blur-md">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase leading-none">DUCATI</h1>
+            <p class="text-red-600 text-[10px] tracking-[0.5em] uppercase font-bold mt-2">Crea tu Perfil Oficial</p>
         </div>
 
-        <form action="/registro" method="POST" class="space-y-5 md:space-y-6" id="ducatiForm">
-            <input type="hidden" name="idioma" id="idiomaInput" value="es">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+        <form action="/registro" method="POST" class="space-y-6" id="ducatiForm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label
                         class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Nombre</label>
-                    <input type="text" name="nombre" required class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm"
+                    <input type="text" name="nombre" required class="w-full carbon-input p-4 text-sm rounded-sm"
                         placeholder="Marc">
                 </div>
                 <div>
                     <label
                         class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Apellido</label>
-                    <input type="text" name="apellido" required
-                        class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm" placeholder="Márquez">
+                    <input type="text" name="apellido" required class="w-full carbon-input p-4 text-sm rounded-sm"
+                        placeholder="Márquez">
                 </div>
             </div>
 
             <div>
                 <label class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Email</label>
-                <input type="email" name="correo" required class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm"
+                <input type="email" name="correo" required class="w-full carbon-input p-4 text-sm rounded-sm"
                     placeholder="moto@ducati.com">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Sede
                         (País)</label>
                     <select name="pais" id="paisSelect" required
-                        class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm appearance-none cursor-pointer">
+                        class="w-full carbon-input p-4 text-sm rounded-sm appearance-none cursor-pointer">
                         <option value="" disabled selected>Selecciona Ubicación</option>
-                        <option value="Venezuela" data-prefix="+58" data-lang="es">🇻🇪 Venezuela</option>
-                        <option value="Italia" data-prefix="+39" data-lang="it">🇮🇹 Italia</option>
-                        <option value="España" data-prefix="+34" data-lang="es">🇪🇸 España</option>
-                        <option value="USA" data-prefix="+1" data-lang="en">🇺🇸 USA</option>
-                        <option value="Japón" data-prefix="+81" data-lang="ja">🇯🇵 Japón</option>
-                        <option value="Alemania" data-prefix="+49" data-lang="de">🇩🇪 Alemania</option>
+                        <option value="Venezuela" data-prefix="+58">🇻🇪 Venezuela</option>
+                        <option value="Italia" data-prefix="+39">🇮🇹 Italia</option>
+                        <option value="España" data-prefix="+34">🇪🇸 España</option>
+                        <option value="USA" data-prefix="+1">🇺🇸 USA</option>
                     </select>
                 </div>
                 <div>
@@ -107,19 +88,18 @@
                         class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Celular</label>
                     <div class="flex">
                         <span id="prefijoVisor"
-                            class="bg-zinc-900 border-2 border-zinc-800 border-r-0 p-3 md:p-4 text-xs md:text-sm text-zinc-500 min-w-[65px] md:min-w-[75px] text-center rounded-l-sm font-mono flex items-center justify-center">--</span>
+                            class="bg-zinc-900 border-2 border-zinc-800 border-r-0 p-4 text-sm text-zinc-500 min-w-[75px] text-center rounded-l-sm font-mono flex items-center justify-center">--</span>
                         <input type="number" name="celular" required
-                            class="w-full carbon-input p-3 md:p-4 text-sm rounded-r-sm border-l-0"
-                            placeholder="0000000">
+                            class="w-full carbon-input p-4 text-sm rounded-r-sm border-l-0" placeholder="0000000">
                     </div>
                 </div>
             </div>
 
             <div>
-                <label class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Moto
+                <label class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2 text-red-600">Moto
                     Preferida</label>
                 <select name="moto_preferida" required
-                    class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm appearance-none cursor-pointer">
+                    class="w-full carbon-input p-4 text-sm rounded-sm appearance-none cursor-pointer">
                     <option value="" disabled selected>Selecciona tu Bestia</option>
                     <% motos.forEach(moto=> { %>
                         <option value="<%= moto.nombre %>">
@@ -129,57 +109,36 @@
                 </select>
             </div>
 
-            <div class="border-t border-zinc-900 pt-5 md:pt-6">
+            <div>
                 <label class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Usuario</label>
-                <input type="text" name="username" required class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm"
+                <input type="text" name="username" required class="w-full carbon-input p-4 text-sm rounded-sm"
                     placeholder="ducati_pilot_93">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label
-                        class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2 italic text-zinc-500">Contraseña
+                        class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2 italic">Contraseña
                         (Mín. 8)</label>
-                    <div class="relative">
-                        <input type="password" id="passwordInput" name="password" required
-                            class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm pr-12" placeholder="••••••••">
-                        <button type="button" onclick="togglePass('passwordInput', 'eye1')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition">
-                            <i class="fas fa-eye" id="eye1"></i>
-                        </button>
-                    </div>
+                    <input type="password" id="passwordInput" name="password" required
+                        class="w-full carbon-input p-4 text-sm rounded-sm" placeholder="••••••••">
                 </div>
                 <div>
                     <label
-                        class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2 italic text-zinc-500">Confirmar</label>
-                    <div class="relative">
-                        <input type="password" id="confirmPasswordInput" required
-                            class="w-full carbon-input p-3 md:p-4 text-sm rounded-sm pr-12" placeholder="••••••••">
-                        <button type="button" onclick="togglePass('confirmPasswordInput', 'eye2')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition">
-                            <i class="fas fa-eye" id="eye2"></i>
-                        </button>
-                    </div>
+                        class="block text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-2 italic">Confirmar</label>
+                    <input type="password" id="confirmPasswordInput" required
+                        class="w-full carbon-input p-4 text-sm rounded-sm" placeholder="••••••••">
                 </div>
             </div>
 
-            <div class="text-center py-2">
-                <p id="passMsg"
-                    class="text-[8px] italic uppercase font-black tracking-widest text-zinc-600 leading-relaxed">
-                    SISTEMA: ESPERANDO TELEMETRÍA...
-                </p>
-            </div>
+            <p id="passMsg" class="text-[8px] italic uppercase font-black tracking-widest text-zinc-600 text-center">
+                SISTEMA: ESPERANDO TELEMETRÍA...</p>
 
-            <button type="submit" id="submitBtn"
+            <button type="submit"
                 class="w-full bg-red-600 hover:bg-white hover:text-black text-white font-black py-4 rounded-sm uppercase italic text-xs tracking-[0.2em] transition-all duration-500 shadow-lg shadow-red-600/20">
                 Confirmar Inscripción
             </button>
         </form>
-
-        <p class="mt-8 text-center text-zinc-600 text-[9px] md:text-[10px] uppercase tracking-wider">
-            ¿Ya tienes cuenta? <a href="/login" class="text-white hover:text-red-600 transition font-bold ml-1">Acceder
-                al Box</a>
-        </p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -189,119 +148,43 @@
         const passMsg = document.getElementById('passMsg');
         const paisSelect = document.getElementById('paisSelect');
         const prefijoVisor = document.getElementById('prefijoVisor');
-        const idiomaInput = document.getElementById('idiomaInput');
-
 
         paisSelect.addEventListener('change', function () {
             const option = this.options[this.selectedIndex];
             prefijoVisor.innerText = option.getAttribute('data-prefix');
-            idiomaInput.value = option.getAttribute('data-lang');
-            prefijoVisor.classList.remove('text-zinc-500');
-            prefijoVisor.classList.add('text-red-600');
+            prefijoVisor.className = "bg-zinc-900 border-2 border-zinc-800 border-r-0 p-4 text-sm text-red-600 min-w-[75px] text-center rounded-l-sm font-mono flex items-center justify-center";
         });
 
-        function togglePass(inputId, eyeId) {
-            const input = document.getElementById(inputId);
-            const eye = document.getElementById(eyeId);
-            input.type = input.type === 'password' ? 'text' : 'password';
-            eye.classList.toggle('fa-eye');
-            eye.classList.toggle('fa-eye-slash');
-        }
-
-
-        function validarFormulario() {
+        function validar() {
             const val = passInput.value;
             const confVal = confirmInput.value;
             const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
-
-            const cumpleRequisitos = regex.test(val);
-            const coinciden = (val === confVal && val !== "");
 
             passInput.classList.remove('status-error', 'status-success');
             confirmInput.classList.remove('status-error', 'status-success');
 
-            if (val.length === 0) {
-                passMsg.innerText = "SISTEMA: ESPERANDO TELEMETRÍA...";
-                passMsg.className = "text-[8px] italic uppercase font-black tracking-widest text-zinc-600";
-            } else if (cumpleRequisitos && coinciden) {
+            if (regex.test(val) && val === confVal) {
                 passInput.classList.add('status-success');
                 confirmInput.classList.add('status-success');
-                passMsg.innerText = "SISTEMA: RACE READY - CONFIGURACIÓN SINCRONIZADA";
-                passMsg.className = "text-[8px] italic uppercase font-black tracking-widest text-green-500";
+                passMsg.innerText = "RACE READY - CONFIGURACIÓN SINCRONIZADA";
+                passMsg.className = "text-[8px] italic uppercase font-black tracking-widest text-green-500 text-center";
             } else {
                 passInput.classList.add('status-error');
-                confirmInput.classList.add('status-error');
-                passMsg.innerText = !cumpleRequisitos ?
-                    "SISTEMA: ERROR - REQUIERE MAYÚSCULA, NÚMERO Y SÍMBOLO" :
-                    "SISTEMA: ERROR - LAS CONTRASEÑAS NO COINCIDEN";
-                passMsg.className = "text-[8px] italic uppercase font-black tracking-widest text-red-600";
+                passMsg.innerText = "ERROR - REQUIERE MAYÚSCULA, NÚMERO Y SÍMBOLO";
+                passMsg.className = "text-[8px] italic uppercase font-black tracking-widest text-red-600 text-center";
             }
         }
 
-        passInput.addEventListener('input', validarFormulario);
-        confirmInput.addEventListener('input', validarFormulario);
+        passInput.addEventListener('input', validar);
+        confirmInput.addEventListener('input', validar);
 
-
-        document.getElementById('ducatiForm').addEventListener('submit', function (e) {
-            const val = passInput.value;
-            const confVal = confirmInput.value;
-            const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
-
-            if (!regex.test(val) || val !== confVal) {
-                e.preventDefault();
-
-
-                Swal.fire({
-                    title: '<span style="color: #ce1d19; font-family: sans-serif; font-weight: 900;">FALLO DE TELEMETRÍA</span>',
-                    text: 'Revisa los requisitos de seguridad de tu contraseña antes de entrar a pista.',
-                    icon: 'error',
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#ce1d19',
-                    confirmButtonText: 'AJUSTAR CONFIGURACIÓN',
-                    customClass: {
-                        popup: 'border-ducati'
-                    }
-                });
-            }
-        });
-
-        window.addEventListener('load', function () {
-            const errorFromServer = "<%= locals.error_type || '' %>";
-
-            if (errorFromServer === 'user_exists') {
-                Swal.fire({
-                    title: '<span style="color: #ce1d19; font-family: sans-serif; font-weight: 900;">ACCESO DENEGADO</span>',
-                    text: 'Este piloto ya está registrado en la base de datos de Borgo Panigale. ¡Intenta iniciar sesión!',
-                    icon: 'warning',
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#ce1d19',
-                    confirmButtonText: 'IR AL LOGIN',
-                    customClass: {
-                        popup: 'border-ducati'
-                    }
-                });
-            } else if (errorFromServer === 'critical') {
-                Swal.fire({
-                    title: '<span style="color: #ce1d19;">FALLO DE TELEMETRÍA</span>',
-                    text: 'Se ha perdido la conexión con los servidores centrales. Intenta de nuevo.',
-                    icon: 'error',
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#ce1d19',
-                    confirmButtonText: 'REINTENTAR'
-                });
+        window.addEventListener('load', () => {
+            const error = "<%= error_type || '' %>";
+            if (error === 'user_exists') {
+                Swal.fire({ title: 'ACCESO DENEGADO', text: 'El piloto ya existe.', icon: 'warning', background: '#111', color: '#fff', confirmButtonColor: '#ce1d19' });
             }
         });
     </script>
-
-    <style>
-        .border-ducati {
-            border: 2px solid #ce1d19 !important;
-            border-radius: 0px !important;
-        }
-    </style>
 </body>
 
 </html>
