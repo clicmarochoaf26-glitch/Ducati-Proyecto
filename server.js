@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const mongoURI = 'mongodb+srv://clicmarochoaf26_db_user:Uen7tpHe7NQleH8D@cluster0.gr6q6rr.mongodb.net/concesionario?retryWrites=true&w=majority&appName=Cluster0';
+const mongoURI = 'mongodb+srv://clicmarochoaf26_db_user:31004460@cluster0.gr6q6rr.mongodb.net/concesionario?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(mongoURI)
     .then(() => console.log('✅ ✅ ✅ DUCATI CONNECTED'))
